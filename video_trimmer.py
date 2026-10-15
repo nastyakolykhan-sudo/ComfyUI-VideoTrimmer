@@ -228,14 +228,25 @@ class LoadVideoTrim:
                 "end_frame": ("INT", {"default": 0, "min": 0, "max": 10_000_000,
                                       "tooltip": "Last frame kept, inclusive. 0 = last frame of the file."}),
                 "keyframe": ("INT", {"default": 0, "min": 0, "max": 10_000_000,
-                                     "tooltip": "Frame sent to the keyframe output. 0 = no keyframe set "
+                                     "tooltip": "Frame sent to the keyframe output, counted from 1 in the whole file; "
+                                                "it must lie inside the trim. 0 = no keyframe set "
                                                 "(the start frame is used)."}),
             },
         }
 
     RETURN_TYPES = ("VIDEO", "IMAGE", "INT", "INT", "INT", "INT", "INT")
     RETURN_NAMES = ("video", "keyframe", "start_frame", "end_frame", "duration_trimmed", "duration_total",
-                    "keyframe_frame")
+                    "keyframe_index")
+    OUTPUT_TOOLTIPS = (
+        "The trimmed video, frames start_frame..end_frame.",
+        "The frame under the keyframe marker (the start frame when no keyframe is set).",
+        "First frame kept, counted from 1 in the whole file.",
+        "Last frame kept, counted from 1 in the whole file.",
+        "Number of frames in the trimmed video.",
+        "Number of frames in the whole file.",
+        "Position of the keyframe inside the trimmed video, counted from 0 "
+        "(keyframe - start_frame). Plugs into a frame index of nodes that take the trimmed frames.",
+    )
     FUNCTION = "load"
     CATEGORY = "video"
     DESCRIPTION = ("Load a video, trim it to a frame range on a timeline, and pick a keyframe. "
@@ -246,6 +257,9 @@ class LoadVideoTrim:
         info = _probe(path)
         total = len(info["pts"])
         start, end, key = _clamp_range(total, start_frame, end_frame, keyframe)
+        if not start <= key <= end:
+            raise ValueError(f"Keyframe {key} is outside the trimmed range {start}-{end}. "
+                             f"Move the keyframe inside the trim, or the trim around it.")
 
         start_time, duration = _window(info, start - 1, end - 1)
         if start == 1 and end == total:
@@ -258,7 +272,7 @@ class LoadVideoTrim:
         if key_images.shape[0] == 0:
             raise RuntimeError(f"Could not decode frame {key} of '{file}'")
 
-        return (video, key_images[:1].contiguous(), start, end, end - start + 1, total, key)
+        return (video, key_images[:1].contiguous(), start, end, end - start + 1, total, key - start)
 
     @classmethod
     def IS_CHANGED(cls, file, **kwargs):

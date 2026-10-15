@@ -150,8 +150,9 @@ class VideoTrimmer {
         } else if (name === "end") {
             this.setWidget("end_frame", Math.max(f, this.start));
         } else if (name === "keyframe") {
-            this.setWidget("keyframe", f);
+            this.setWidget("keyframe", clamp(f, this.start, this.end));
         }
+        this.keepKeyframeInTrim();
         this.changed();
     }
 
@@ -169,8 +170,14 @@ class VideoTrimmer {
         this.setWidget("start_frame", start);
         const end = widget(this.node, "end_frame").value;
         this.setWidget("end_frame", end <= 0 ? this.total : clamp(end, start, this.total));
-        const key = widget(this.node, "keyframe").value;
-        this.setWidget("keyframe", key <= 0 ? 0 : clamp(key, 1, this.total));
+        this.keepKeyframeInTrim();
+    }
+
+    // The keyframe output is also an index into the trimmed video, so the keyframe
+    // stays inside the trim: a trim handle dragged past it pushes it along.
+    keepKeyframeInTrim() {
+        const key = widget(this.node, "keyframe")?.value || 0;
+        if (key > 0) this.setWidget("keyframe", clamp(key, this.start, this.end));
     }
 
     // --- loading --------------------------------------------------------------
@@ -339,7 +346,8 @@ class VideoTrimmer {
             this.setWidget("keyframe", 0);
             if (this.focus === "keyframe") this.focus = "playhead";
         } else {
-            this.setWidget("keyframe", this.playhead);  // added at the playhead, then drag it
+            // Added at the playhead (or the nearest trim edge), then drag it.
+            this.setWidget("keyframe", clamp(this.playhead, this.start, this.end));
             this.focus = "keyframe";
         }
         this.changed();
@@ -369,7 +377,9 @@ class VideoTrimmer {
             item("Start Frame:", this.start, "#fff"),
             item("End Frame:", this.end, "#fff"),
             item("Duration:", `${n} Frames <span style="color:#777">(${(n / fps).toFixed(1)}s @ ${fpsText}fps)</span>`, "#fff"),
-            item("Keyframe:", this.keyframe || "none", this.keyframe ? KEYFRAME_COLOR : "#666"),
+            item("Keyframe:", this.keyframe
+                ? `${this.keyframe} <span style="color:#777">(index ${this.keyframe - this.start} in trim)</span>`
+                : "none", this.keyframe ? KEYFRAME_COLOR : "#666"),
         );
     }
 

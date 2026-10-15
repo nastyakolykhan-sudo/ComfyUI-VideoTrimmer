@@ -9,7 +9,8 @@ and a keyframe picker built into the node.
   and then pull the handle to it.
 - **Add keyframe**: drops a second marker (cyan) at the playhead. Drag it by its
   diamond under the strip; it snaps to the playhead and the trim edges the same way.
-  The button then becomes **Remove keyframe**.
+  The button then becomes **Remove keyframe**. The keyframe always stays inside the
+  trim: a trim handle dragged past it pushes it along.
 - **Arrow keys** (click the timeline first): move the selected marker by 1 frame,
   Shift for 10. **Space** plays and pauses. **Play** loops the trimmed range.
 - **Upload video**, or drop a video file on the node.
@@ -28,7 +29,11 @@ Frame numbers start at **1**, as in the timeline. The range is inclusive.
 | `end_frame` | INT | Last frame kept |
 | `duration_trimmed` | INT | Frames in the trimmed video (`end_frame - start_frame + 1`) |
 | `duration_total` | INT | Frames in the whole file |
-| `keyframe_frame` | INT | Frame number of the `keyframe` image (the start frame when no keyframe is set) |
+| `keyframe_index` | INT | Position of the keyframe **inside the trimmed video**, counted from 0 (`keyframe - start_frame`; 0 when no keyframe is set) |
+
+`keyframe_index` is what nodes working on the trimmed frames expect, e.g. SeC Video
+Segmentation's `annotation_frame_idx`: with the trim at 35-204 and the keyframe on 120,
+it is 85, the 86th frame of the trimmed video.
 
 `end_frame = 0` means "to the last frame" and `keyframe = 0` means "no keyframe",
 so the node also works from the API without the editor.
