@@ -1,0 +1,1 @@
+# No extra dependencies beyond what ComfyUI already provides (av, numpy, Pillow, aiohttp).
