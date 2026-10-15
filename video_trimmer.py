@@ -233,8 +233,9 @@ class LoadVideoTrim:
             },
         }
 
-    RETURN_TYPES = ("VIDEO", "IMAGE", "INT", "INT", "INT", "INT")
-    RETURN_NAMES = ("video", "keyframe", "start_frame", "end_frame", "duration_trimmed", "duration_total")
+    RETURN_TYPES = ("VIDEO", "IMAGE", "INT", "INT", "INT", "INT", "INT")
+    RETURN_NAMES = ("video", "keyframe", "start_frame", "end_frame", "duration_trimmed", "duration_total",
+                    "keyframe_frame")
     FUNCTION = "load"
     CATEGORY = "video"
     DESCRIPTION = ("Load a video, trim it to a frame range on a timeline, and pick a keyframe. "
@@ -257,7 +258,7 @@ class LoadVideoTrim:
         if key_images.shape[0] == 0:
             raise RuntimeError(f"Could not decode frame {key} of '{file}'")
 
-        return (video, key_images[:1].contiguous(), start, end, end - start + 1, total)
+        return (video, key_images[:1].contiguous(), start, end, end - start + 1, total, key)
 
     @classmethod
     def IS_CHANGED(cls, file, **kwargs):

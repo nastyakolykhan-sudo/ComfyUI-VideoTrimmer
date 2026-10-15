@@ -28,6 +28,7 @@ Frame numbers start at **1**, as in the timeline. The range is inclusive.
 | `end_frame` | INT | Last frame kept |
 | `duration_trimmed` | INT | Frames in the trimmed video (`end_frame - start_frame + 1`) |
 | `duration_total` | INT | Frames in the whole file |
+| `keyframe_frame` | INT | Frame number of the `keyframe` image (the start frame when no keyframe is set) |
 
 `end_frame = 0` means "to the last frame" and `keyframe = 0` means "no keyframe",
 so the node also works from the API without the editor.
