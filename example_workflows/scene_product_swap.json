@@ -1,8 +1,8 @@
 {
   "id": "827772fa-121e-4154-9cc9-e22349b0def1",
   "revision": 0,
-  "last_node_id": 21,
-  "last_link_id": 28,
+  "last_node_id": 26,
+  "last_link_id": 36,
   "nodes": [
     {
       "id": 2,
@@ -16,14 +16,14 @@
         346
       ],
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
           "localized_name": "video",
           "name": "video",
           "type": "VIDEO",
-          "link": 20
+          "link": 29
         },
         {
           "localized_name": "detector",
@@ -191,7 +191,7 @@
         370
       ],
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -226,7 +226,7 @@
         320
       ],
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -252,71 +252,6 @@
       "widgets_values_named": {}
     },
     {
-      "id": 5,
-      "type": "LoadImage",
-      "pos": [
-        40,
-        900
-      ],
-      "size": [
-        520,
-        340
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "image",
-          "name": "image",
-          "type": "COMBO",
-          "widget": {
-            "name": "image"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "choose file to upload",
-          "name": "upload",
-          "type": "IMAGEUPLOAD",
-          "widget": {
-            "name": "upload"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "IMAGE",
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            5,
-            11,
-            23
-          ]
-        },
-        {
-          "localized_name": "MASK",
-          "name": "MASK",
-          "type": "MASK",
-          "links": null
-        }
-      ],
-      "title": "Product photo",
-      "properties": {
-        "Node name for S&R": "LoadImage"
-      },
-      "widgets_values": [
-        "product.png",
-        "image"
-      ],
-      "widgets_values_named": {
-        "image": "product.png",
-        "upload": "image"
-      }
-    },
-    {
       "id": 6,
       "type": "GeminiNodeV3",
       "pos": [
@@ -328,7 +263,7 @@
         420
       ],
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
@@ -354,7 +289,7 @@
           "name": "model.images.image_1",
           "shape": 7,
           "type": "IMAGE",
-          "link": 5
+          "link": 30
         },
         {
           "localized_name": "image_2",
@@ -478,10 +413,10 @@
       ],
       "size": [
         300,
-        186
+        206
       ],
       "flags": {},
-      "order": 8,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -573,6 +508,15 @@
           "shape": 6,
           "type": "STRING",
           "links": null
+        },
+        {
+          "localized_name": "labels",
+          "name": "labels",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            35
+          ]
         }
       ],
       "title": "Scene Gate (product scenes)",
@@ -595,14 +539,14 @@
       "type": "PreviewAny",
       "pos": [
         1780,
-        260
+        336
       ],
       "size": [
         300,
-        240
+        170
       ],
       "flags": {},
-      "order": 12,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -639,7 +583,7 @@
         122
       ],
       "flags": {},
-      "order": 10,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -714,7 +658,7 @@
         536
       ],
       "flags": {},
-      "order": 13,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -794,7 +738,7 @@
           "name": "model.reference_images.image_1",
           "shape": 7,
           "type": "IMAGE",
-          "link": 11
+          "link": 31
         },
         {
           "localized_name": "image_2",
@@ -931,88 +875,6 @@
       "bgcolor": "#653"
     },
     {
-      "id": 11,
-      "type": "SaveVideo",
-      "pos": [
-        2980,
-        80
-      ],
-      "size": [
-        280,
-        106
-      ],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "video",
-          "name": "video",
-          "type": "VIDEO",
-          "link": 28
-        },
-        {
-          "localized_name": "filename_prefix",
-          "name": "filename_prefix",
-          "type": "STRING",
-          "widget": {
-            "name": "filename_prefix"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "format",
-          "name": "format",
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "format"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "codec",
-          "name": "format.codec",
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "format.codec"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "codec",
-          "name": "codec",
-          "shape": 7,
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "codec"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "video",
-          "name": "video",
-          "type": "VIDEO",
-          "links": null
-        }
-      ],
-      "title": "Save raw swaps (either model)",
-      "properties": {},
-      "widgets_values": [
-        "scene_swap/raw/swap",
-        "auto",
-        "auto",
-        "auto"
-      ],
-      "widgets_values_named": {
-        "filename_prefix": "scene_swap/raw/swap",
-        "format": "auto",
-        "format.codec": "auto",
-        "codec": "auto"
-      }
-    },
-    {
       "id": 12,
       "type": "JoinScenes",
       "pos": [
@@ -1024,7 +886,7 @@
         122
       ],
       "flags": {},
-      "order": 16,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -1071,7 +933,7 @@
           "name": "video",
           "type": "VIDEO",
           "links": [
-            17
+            36
           ]
         },
         {
@@ -1107,7 +969,7 @@
         220
       ],
       "flags": {},
-      "order": 19,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -1133,88 +995,6 @@
       "widgets_values_named": {}
     },
     {
-      "id": 14,
-      "type": "SaveVideo",
-      "pos": [
-        2980,
-        800
-      ],
-      "size": [
-        280,
-        106
-      ],
-      "flags": {},
-      "order": 18,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "video",
-          "name": "video",
-          "type": "VIDEO",
-          "link": 17
-        },
-        {
-          "localized_name": "filename_prefix",
-          "name": "filename_prefix",
-          "type": "STRING",
-          "widget": {
-            "name": "filename_prefix"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "format",
-          "name": "format",
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "format"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "codec",
-          "name": "format.codec",
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "format.codec"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "codec",
-          "name": "codec",
-          "shape": 7,
-          "type": "COMFY_DYNAMICCOMBO_V3",
-          "widget": {
-            "name": "codec"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "video",
-          "name": "video",
-          "type": "VIDEO",
-          "links": null
-        }
-      ],
-      "title": "Final film",
-      "properties": {},
-      "widgets_values": [
-        "scene_swap/final",
-        "auto",
-        "auto",
-        "auto"
-      ],
-      "widgets_values_named": {
-        "filename_prefix": "scene_swap/final",
-        "format": "auto",
-        "format.codec": "auto",
-        "codec": "auto"
-      }
-    },
-    {
       "id": 15,
       "type": "SelectScene",
       "pos": [
@@ -1226,7 +1006,7 @@
         58
       ],
       "flags": {},
-      "order": 5,
+      "order": 6,
       "mode": 4,
       "inputs": [
         {
@@ -1278,7 +1058,7 @@
         106
       ],
       "flags": {},
-      "order": 9,
+      "order": 10,
       "mode": 4,
       "inputs": [
         {
@@ -1360,77 +1140,20 @@
         330
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [],
       "title": "How this works",
       "properties": {},
       "widgets_values": [
-        "1. Upload your video (Source video; trim it with Trim Video if needed) and a clear photo of the product (Product photo).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
+        "1. Inputs are Workflow IO nodes: video, product_image, use_wan (set them here, or per call by param_name).\n   Outputs: final_film and the swapped scenes (scene_N).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
       ],
       "widgets_values_named": {
-        "text": "1. Upload your video (Source video; trim it with Trim Video if needed) and a clear photo of the product (Product photo).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
+        "text": "1. Inputs are Workflow IO nodes: video, product_image, use_wan (set them here, or per call by param_name).\n   Outputs: final_film and the swapped scenes (scene_N).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
       },
       "color": "#432",
       "bgcolor": "#653"
-    },
-    {
-      "id": 18,
-      "type": "LoadVideo",
-      "pos": [
-        40,
-        80
-      ],
-      "size": [
-        282.798828125,
-        233.0743408203125
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "file",
-          "name": "file",
-          "type": "COMBO",
-          "widget": {
-            "name": "file"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "choose file to upload",
-          "name": "upload",
-          "type": "IMAGEUPLOAD",
-          "widget": {
-            "name": "upload"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "VIDEO",
-          "name": "VIDEO",
-          "type": "VIDEO",
-          "links": [
-            20
-          ]
-        }
-      ],
-      "title": "Source video",
-      "properties": {
-        "Node name for S&R": "LoadVideo"
-      },
-      "widgets_values": [
-        "multi.mp4",
-        "image"
-      ],
-      "widgets_values_named": {
-        "file": "multi.mp4",
-        "upload": "image"
-      }
     },
     {
       "id": 19,
@@ -1441,10 +1164,10 @@
       ],
       "size": [
         420,
-        404
+        424
       ],
       "flags": {},
-      "order": 14,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -1515,7 +1238,7 @@
           "name": "model.reference_images.image1",
           "shape": 7,
           "type": "IMAGE",
-          "link": 23
+          "link": 32
         },
         {
           "localized_name": "image2",
@@ -1624,7 +1347,7 @@
         186
       ],
       "flags": {},
-      "order": 11,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -1722,7 +1445,7 @@
         78
       ],
       "flags": {},
-      "order": 15,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -1746,7 +1469,7 @@
           "widget": {
             "name": "switch"
           },
-          "link": null
+          "link": 33
         }
       ],
       "outputs": [
@@ -1756,7 +1479,7 @@
           "type": "VIDEO",
           "links": [
             27,
-            28
+            34
           ]
         }
       ],
@@ -1769,6 +1492,607 @@
       ],
       "widgets_values_named": {
         "switch": false
+      }
+    },
+    {
+      "id": 22,
+      "type": "WorkflowIOVideoInput",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        400,
+        304
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "param_name",
+          "name": "param_name",
+          "type": "STRING",
+          "widget": {
+            "name": "param_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "accepted_formats",
+          "name": "accepted_formats",
+          "type": "STRING",
+          "widget": {
+            "name": "accepted_formats"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "max_size_mb",
+          "name": "max_size_mb",
+          "type": "INT",
+          "widget": {
+            "name": "max_size_mb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "required",
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "description",
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "example",
+          "name": "example",
+          "type": "STRING",
+          "widget": {
+            "name": "example"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "advanced",
+          "name": "advanced",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "advanced"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "group",
+          "name": "group",
+          "type": "STRING",
+          "widget": {
+            "name": "group"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "order",
+          "name": "order",
+          "type": "INT",
+          "widget": {
+            "name": "order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            29
+          ]
+        }
+      ],
+      "title": "1. video",
+      "properties": {
+        "Node name for S&R": "WorkflowIOVideoInput"
+      },
+      "widgets_values": [
+        "video",
+        "multi.mp4",
+        "mp4,mov,webm",
+        500,
+        true,
+        "The video to edit. It's split into scenes at its cuts; scenes showing the product are swapped and the film is put back together, frame-exact, with its original audio.",
+        "sizzle_reel.mp4",
+        false,
+        "Source",
+        1
+      ],
+      "widgets_values_named": {
+        "param_name": "video",
+        "value": "multi.mp4",
+        "accepted_formats": "mp4,mov,webm",
+        "max_size_mb": 500,
+        "required": true,
+        "description": "The video to edit. It's split into scenes at its cuts; scenes showing the product are swapped and the film is put back together, frame-exact, with its original audio.",
+        "example": "sizzle_reel.mp4",
+        "advanced": false,
+        "group": "Source",
+        "order": 1
+      }
+    },
+    {
+      "id": 23,
+      "type": "WorkflowIOImageInput",
+      "pos": [
+        40,
+        900
+      ],
+      "size": [
+        400,
+        324
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "param_name",
+          "name": "param_name",
+          "type": "STRING",
+          "widget": {
+            "name": "param_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "accepted_formats",
+          "name": "accepted_formats",
+          "type": "STRING",
+          "widget": {
+            "name": "accepted_formats"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "max_size_mb",
+          "name": "max_size_mb",
+          "type": "INT",
+          "widget": {
+            "name": "max_size_mb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "required",
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "description",
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "example",
+          "name": "example",
+          "type": "STRING",
+          "widget": {
+            "name": "example"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "advanced",
+          "name": "advanced",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "advanced"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "group",
+          "name": "group",
+          "type": "STRING",
+          "widget": {
+            "name": "group"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "order",
+          "name": "order",
+          "type": "INT",
+          "widget": {
+            "name": "order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            30,
+            31,
+            32
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "2. product_image",
+      "properties": {
+        "Node name for S&R": "WorkflowIOImageInput"
+      },
+      "widgets_values": [
+        "product_image",
+        "product.png",
+        "png,jpg,jpeg,webp",
+        20,
+        true,
+        "A clear photo of the new product. Gemini uses it to find the scenes that show the product; the video model puts it into those scenes.",
+        "new_bottle.png",
+        false,
+        "Product",
+        2
+      ],
+      "widgets_values_named": {
+        "param_name": "product_image",
+        "value": "product.png",
+        "accepted_formats": "png,jpg,jpeg,webp",
+        "max_size_mb": 20,
+        "required": true,
+        "description": "A clear photo of the new product. Gemini uses it to find the scenes that show the product; the video model puts it into those scenes.",
+        "example": "new_bottle.png",
+        "advanced": false,
+        "group": "Product",
+        "order": 2
+      }
+    },
+    {
+      "id": 24,
+      "type": "WorkflowIOBoolInput",
+      "pos": [
+        40,
+        460
+      ],
+      "size": [
+        400,
+        256
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "param_name",
+          "name": "param_name",
+          "type": "STRING",
+          "widget": {
+            "name": "param_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "required",
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "description",
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "example",
+          "name": "example",
+          "type": "STRING",
+          "widget": {
+            "name": "example"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "advanced",
+          "name": "advanced",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "advanced"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "group",
+          "name": "group",
+          "type": "STRING",
+          "widget": {
+            "name": "group"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "order",
+          "name": "order",
+          "type": "INT",
+          "widget": {
+            "name": "order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "title": "3. use_wan",
+      "properties": {
+        "Node name for S&R": "WorkflowIOBoolInput"
+      },
+      "widgets_values": [
+        "use_wan",
+        false,
+        false,
+        "Off: Seedance 2.5 edit swaps the product (scenes under 4 s are padded, then trimmed back). On: Wan 3.0 Reference to Video (no minimum; scenes up to 15 s). Only the chosen model runs.",
+        "false",
+        false,
+        "Video model",
+        3
+      ],
+      "widgets_values_named": {
+        "param_name": "use_wan",
+        "value": false,
+        "required": false,
+        "description": "Off: Seedance 2.5 edit swaps the product (scenes under 4 s are padded, then trimmed back). On: Wan 3.0 Reference to Video (no minimum; scenes up to 15 s). Only the chosen model runs.",
+        "example": "false",
+        "advanced": false,
+        "group": "Video model",
+        "order": 3
+      }
+    },
+    {
+      "id": 25,
+      "type": "WorkflowIOVideoOutput",
+      "pos": [
+        2980,
+        80
+      ],
+      "size": [
+        272.1724609375,
+        150
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 34
+        },
+        {
+          "localized_name": "filename",
+          "name": "filename",
+          "shape": 7,
+          "type": "STRING",
+          "link": 35
+        },
+        {
+          "localized_name": "output_name",
+          "name": "output_name",
+          "type": "STRING",
+          "widget": {
+            "name": "output_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_template",
+          "name": "filename_template",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_template"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "include",
+          "name": "include",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "include"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "title": "Output: swapped scenes (scene_N)",
+      "properties": {
+        "Node name for S&R": "WorkflowIOVideoOutput"
+      },
+      "widgets_values": [
+        "swapped_scene",
+        "",
+        "auto",
+        true
+      ],
+      "widgets_values_named": {
+        "output_name": "swapped_scene",
+        "filename_template": "",
+        "format": "auto",
+        "include": true
+      }
+    },
+    {
+      "id": 26,
+      "type": "WorkflowIOVideoOutput",
+      "pos": [
+        2980,
+        800
+      ],
+      "size": [
+        272.1724609375,
+        150
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 36
+        },
+        {
+          "localized_name": "filename",
+          "name": "filename",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "localized_name": "output_name",
+          "name": "output_name",
+          "type": "STRING",
+          "widget": {
+            "name": "output_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_template",
+          "name": "filename_template",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_template"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "include",
+          "name": "include",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "include"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "title": "Output: final_film",
+      "properties": {
+        "Node name for S&R": "WorkflowIOVideoOutput"
+      },
+      "widgets_values": [
+        "final_film",
+        "",
+        "mp4",
+        true
+      ],
+      "widgets_values_named": {
+        "output_name": "final_film",
+        "filename_template": "",
+        "format": "mp4",
+        "include": true
       }
     }
   ],
@@ -1854,14 +2178,6 @@
       "VIDEO"
     ],
     [
-      20,
-      18,
-      0,
-      2,
-      0,
-      "VIDEO"
-    ],
-    [
       21,
       7,
       0,
@@ -1894,22 +2210,6 @@
       "VIDEO"
     ],
     [
-      28,
-      21,
-      0,
-      11,
-      0,
-      "VIDEO"
-    ],
-    [
-      17,
-      12,
-      0,
-      14,
-      0,
-      "VIDEO"
-    ],
-    [
       19,
       15,
       0,
@@ -1918,28 +2218,12 @@
       "VIDEO"
     ],
     [
-      5,
-      5,
-      0,
-      6,
-      2,
-      "IMAGE"
-    ],
-    [
       4,
       2,
       0,
       6,
       5,
       "VIDEO"
-    ],
-    [
-      11,
-      5,
-      0,
-      10,
-      8,
-      "IMAGE"
     ],
     [
       10,
@@ -1958,19 +2242,75 @@
       "COMBO"
     ],
     [
+      22,
+      7,
+      0,
+      19,
+      10,
+      "VIDEO"
+    ],
+    [
+      29,
+      22,
+      0,
+      2,
+      0,
+      "VIDEO"
+    ],
+    [
+      30,
       23,
-      5,
+      0,
+      6,
+      2,
+      "IMAGE"
+    ],
+    [
+      31,
+      23,
+      0,
+      10,
+      8,
+      "IMAGE"
+    ],
+    [
+      32,
+      23,
       0,
       19,
       7,
       "IMAGE"
     ],
     [
-      22,
-      7,
+      33,
+      24,
       0,
-      19,
-      10,
+      21,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      34,
+      21,
+      0,
+      25,
+      0,
+      "VIDEO"
+    ],
+    [
+      35,
+      7,
+      5,
+      25,
+      1,
+      "STRING"
+    ],
+    [
+      36,
+      12,
+      0,
+      26,
+      0,
       "VIDEO"
     ]
   ],

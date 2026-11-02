@@ -531,15 +531,17 @@ class SceneGate:
             },
         }
 
-    RETURN_TYPES = ("VIDEO", "INT", "INT", "STRING", "STRING")
-    RETURN_NAMES = ("selected_scenes", "selected_indices", "count", "report", "answers")
-    OUTPUT_IS_LIST = (True, True, False, False, True)
+    RETURN_TYPES = ("VIDEO", "INT", "INT", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("selected_scenes", "selected_indices", "count", "report", "answers", "labels")
+    OUTPUT_IS_LIST = (True, True, False, False, True, True)
     OUTPUT_TOOLTIPS = (
         "The selected scenes, in order (list). Nothing downstream runs when there are none.",
         "Their positions in the scenes list, counted from 0 (list). Wire into Join Scenes or a next gate.",
         "How many scenes were selected.",
         "JSON: every scene's number, length, verdict, confidence and description. Feeds Scene Prompt Context.",
         "The selected scenes' answers, as given (list; empty strings with filter off). Get JSON Field reads them.",
+        "A name per selected scene, \"scene_3\" (list): wire into a save node's filename so per-scene files don't "
+        "overwrite each other.",
     )
     FUNCTION = "gate"
     CATEGORY = "video"
@@ -595,7 +597,8 @@ class SceneGate:
                              "selected_scenes": [i + 1 for i in picked], "scene_count": len(scenes),
                              "scenes": rows, "warnings": warnings}, indent=2)
         selected = [scenes[i] for i in picked] or [ExecutionBlocker(None)]
-        return (selected, picked, len(picked), report, answers or [ExecutionBlocker(None)])
+        labels = [f"scene_{i + 1}" for i in picked] or [ExecutionBlocker(None)]
+        return (selected, picked, len(picked), report, answers or [ExecutionBlocker(None)], labels)
 
 
 def _scene_list(numbers):

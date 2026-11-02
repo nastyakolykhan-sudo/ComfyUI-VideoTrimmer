@@ -74,18 +74,28 @@ Load Video → Split Video by Scene ─┬─ scenes ─────────
                                    └───────────────────────────────→ Join Scenes → Save Video
 ```
 
-`example_workflows/scene_edit_wan.json` is the general version. Four inputs:
+`example_workflows/scene_edit_wan.json` is the general version. Its inputs and outputs are
+[Workflow IO](https://github.com/aw93silverside/comfy-workflow-io-nodes) nodes, so it
+doubles as an API: each input has a `param_name`, description, example, group and order.
 
-- **Filter** (on/off) and **Filter Prompt**: on, a Gemini node watches every scene and keeps
-  the ones that match the prompt (a product, people, nature, furniture, anything). Off,
-  every scene goes on and that LLM doesn't run.
-- **Edit Prompt**: what to change, written once for the whole video. It can name scenes
-  ("in scene 3...") or describe them. A second Gemini node runs once per remaining scene.
-  Scene Prompt Context gives it the request, every scene's number, timing and description
-  and which scene it's looking at; it also sees the contact sheet and the reference image.
-  It writes a self-contained Wan 3.0 prompt (what changes, and everything that stays the
-  same), or decides that this scene needs no edit.
-- **Reference image** (optional; bypass the node if there's none).
+| Input (`param_name`) | Type | |
+|---|---|---|
+| `video` | video | The video to edit |
+| `filter` | bool | On: only scenes matching `filter_prompt` are edited. Off: every scene goes to the prompt writer and the filter LLM doesn't run |
+| `filter_prompt` | text | What to look for: a product or brand, people, nature, furniture, anything visible |
+| `edit_prompt` | text | What to change, once for the whole video. Can name scenes ("in scene 3...") or describe them |
+| `reference_image` | image | What the edit refers to (e.g. the new product). Required: the IO image input can't be left empty |
+| `detector`, `min_scene_length`, `resolution` | advanced | Scene detection and Wan's output resolution |
+
+Outputs: `final_film` (mp4), the edited scenes (`scene_N`, one file per scene, named by
+Scene Gate's `labels`) and the `contact_sheet`.
+
+How it runs: the filter LLM (Gemini) watches each scene against `filter_prompt`. A second
+Gemini node runs once per remaining scene. Scene Prompt Context gives it the request,
+every scene's number, timing and description and which scene it's looking at; it also
+sees the contact sheet and the reference image. It writes a self-contained Wan 3.0 prompt
+(what changes, and everything that stays the same), or decides that this scene needs no
+edit.
 
 Wan 3.0 Reference to Video then edits each chosen scene (`@Video1` = the scene, `@Image1`
 = the reference), with its duration set per scene by Video Duration, and Join Scenes puts
@@ -97,13 +107,12 @@ confidence, since a missed scene can't be recovered while an extra one only cost
 call (and the writer can still keep it as it is). A product doesn't need a readable label.
 
 `example_workflows/scene_product_swap.json` is the earlier, simpler version: one LLM yes/no
-per scene, then Seedance 2.5 edit or Wan 3.0 behind ComfyUI's If/Else Switch (only the
-selected model runs; Pad Video brings scenes up to Seedance's 4 s minimum).
+per scene, then Seedance 2.5 edit or Wan 3.0 (`use_wan`) behind ComfyUI's If/Else Switch
+(only the selected model runs; Pad Video brings scenes up to Seedance's 4 s minimum).
+Inputs `video`, `product_image`, `use_wan`; outputs `final_film` and the swapped scenes.
 
-Both use ComfyUI's own Load Video as the source, so they run on Comfy Cloud, which only
-fetches uploads for the core loaders; locally, Load Video (Trim + Keyframe) can take its
-place. Any LLM node that returns text, and any video node that takes a VIDEO and returns
-one, can stand in for Gemini and Wan.
+Both need the Workflow IO pack. Any LLM node that returns text, and any video node that
+takes a VIDEO and returns one, can stand in for Gemini and Wan.
 
 ### Split Video by Scene
 
@@ -144,8 +153,9 @@ no; `if_unclear` sends, skips or stops on answers it can't read.
 
 Outputs the `selected_scenes` (list), their `selected_indices` (positions in `scenes`,
 list), `count`, a JSON `report` (every scene's number, length, verdict, confidence and
-description) and the selected scenes' `answers` (list). With nothing selected, nothing
-after `selected_scenes` / `answers` runs.
+description), the selected scenes' `answers` (list) and `labels` ("scene_3"... per selected
+scene: wire into a save node's filename so per-scene files don't overwrite each other).
+With nothing selected, nothing after `selected_scenes` / `answers` / `labels` runs.
 
 **Chaining:** a second gate takes the same `scenes`, the first gate's `selected_indices` as
 `indices`, and verdicts for just those scenes. Its outputs are still positions in the full
