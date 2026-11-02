@@ -1,0 +1,2028 @@
+{
+  "id": "827772fa-121e-4154-9cc9-e22349b0def1",
+  "revision": 0,
+  "last_node_id": 21,
+  "last_link_id": 28,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "SplitVideoByScene",
+      "pos": [
+        600,
+        80
+      ],
+      "size": [
+        300,
+        346
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 20
+        },
+        {
+          "localized_name": "detector",
+          "name": "detector",
+          "type": "COMBO",
+          "widget": {
+            "name": "detector"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "content_threshold",
+          "name": "content_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "content_threshold"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "adaptive_threshold",
+          "name": "adaptive_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "adaptive_threshold"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "fade_threshold",
+          "name": "fade_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "fade_threshold"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "min_scene_length",
+          "name": "min_scene_length",
+          "type": "INT",
+          "widget": {
+            "name": "min_scene_length"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "trim_edges",
+          "name": "trim_edges",
+          "type": "INT",
+          "widget": {
+            "name": "trim_edges"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "analysis_size",
+          "name": "analysis_size",
+          "type": "INT",
+          "widget": {
+            "name": "analysis_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cut_overrides",
+          "name": "cut_overrides",
+          "type": "STRING",
+          "widget": {
+            "name": "cut_overrides"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "scenes",
+          "name": "scenes",
+          "shape": 6,
+          "type": "VIDEO",
+          "links": [
+            4,
+            6,
+            13,
+            18
+          ]
+        },
+        {
+          "localized_name": "first_frames",
+          "name": "first_frames",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "localized_name": "start_frames",
+          "name": "start_frames",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "end_frames",
+          "name": "end_frames",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "scene_count",
+          "name": "scene_count",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "cut_list",
+          "name": "cut_list",
+          "type": "STRING",
+          "links": [
+            3
+          ]
+        },
+        {
+          "localized_name": "contact_sheet",
+          "name": "contact_sheet",
+          "type": "IMAGE",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SplitVideoByScene"
+      },
+      "widgets_values": [
+        "all",
+        27,
+        3,
+        12,
+        12,
+        0,
+        256,
+        ""
+      ],
+      "widgets_values_named": {
+        "detector": "all",
+        "content_threshold": 27,
+        "adaptive_threshold": 3,
+        "fade_threshold": 12,
+        "min_scene_length": 12,
+        "trim_edges": 0,
+        "analysis_size": 256,
+        "cut_overrides": ""
+      }
+    },
+    {
+      "id": 3,
+      "type": "PreviewImage",
+      "pos": [
+        600,
+        470
+      ],
+      "size": [
+        640,
+        370
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "title": "Contact sheet (scene numbers)",
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 4,
+      "type": "PreviewAny",
+      "pos": [
+        940,
+        80
+      ],
+      "size": [
+        300,
+        320
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "source",
+          "name": "source",
+          "type": "*",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Cut list",
+      "properties": {
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [],
+      "widgets_values_named": {}
+    },
+    {
+      "id": 5,
+      "type": "LoadImage",
+      "pos": [
+        40,
+        900
+      ],
+      "size": [
+        520,
+        340
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "choose file to upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5,
+            11,
+            23
+          ]
+        },
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Product photo",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "product.png",
+        "image"
+      ],
+      "widgets_values_named": {
+        "image": "product.png",
+        "upload": "image"
+      }
+    },
+    {
+      "id": 6,
+      "type": "GeminiNodeV3",
+      "pos": [
+        1320,
+        80
+      ],
+      "size": [
+        420,
+        420
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "prompt",
+          "name": "model.prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "model.prompt"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "image_1",
+          "name": "model.images.image_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 5
+        },
+        {
+          "localized_name": "image_2",
+          "name": "model.images.image_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "audio_1",
+          "name": "model.audio.audio_1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "localized_name": "video_1",
+          "name": "model.video.video_1",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 4
+        },
+        {
+          "localized_name": "video_processing",
+          "name": "model.video_processing",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.video_processing"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "thinking_level",
+          "name": "model.thinking_level",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.thinking_level"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "max_output_tokens",
+          "name": "model.max_output_tokens",
+          "type": "INT",
+          "widget": {
+            "name": "model.max_output_tokens"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "model.seed",
+          "type": "INT",
+          "widget": {
+            "name": "model.seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "system_prompt",
+          "name": "model.system_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "model.system_prompt"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "files",
+          "name": "model.files",
+          "shape": 7,
+          "type": "GEMINI_INPUT_FILES",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "title": "Is the product in this scene? (runs once per scene)",
+      "properties": {
+        "Node name for S&R": "GeminiNodeV3"
+      },
+      "widgets_values": [
+        "Gemini 3.8 Flash",
+        "Image 1 is the product. Does this video clip show this exact product (any angle, even partly or briefly)? Reply with JSON only, no other text: {\"product\": true or false, \"confidence\": 0 to 1, \"why\": \"one short sentence\"}",
+        "static",
+        "LOW",
+        32768,
+        42,
+        "fixed",
+        "You check video shots for one specific product. Only the same product counts, not similar items. Answer with a single JSON object.",
+        "fixed"
+      ],
+      "widgets_values_named": {
+        "model": "Gemini 3.8 Flash",
+        "model.prompt": "Image 1 is the product. Does this video clip show this exact product (any angle, even partly or briefly)? Reply with JSON only, no other text: {\"product\": true or false, \"confidence\": 0 to 1, \"why\": \"one short sentence\"}",
+        "model.video_processing": "static",
+        "model.thinking_level": "LOW",
+        "model.max_output_tokens": 32768,
+        "model.seed": 42,
+        "control_after_generate#1": "fixed",
+        "model.system_prompt": "You check video shots for one specific product. Only the same product counts, not similar items. Answer with a single JSON object.",
+        "control_after_generate": "fixed"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 7,
+      "type": "SceneGate",
+      "pos": [
+        1780,
+        80
+      ],
+      "size": [
+        300,
+        142
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "scenes",
+          "name": "scenes",
+          "type": "VIDEO",
+          "link": 6
+        },
+        {
+          "localized_name": "verdicts",
+          "name": "verdicts",
+          "type": "STRING",
+          "link": 7
+        },
+        {
+          "localized_name": "min_confidence",
+          "name": "min_confidence",
+          "type": "FLOAT",
+          "widget": {
+            "name": "min_confidence"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "if_unclear",
+          "name": "if_unclear",
+          "type": "COMBO",
+          "widget": {
+            "name": "if_unclear"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "product_scenes",
+          "name": "product_scenes",
+          "shape": 6,
+          "type": "VIDEO",
+          "links": [
+            9,
+            21,
+            22
+          ]
+        },
+        {
+          "localized_name": "product_indices",
+          "name": "product_indices",
+          "shape": 6,
+          "type": "INT",
+          "links": [
+            14
+          ]
+        },
+        {
+          "localized_name": "product_count",
+          "name": "product_count",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "report",
+          "name": "report",
+          "type": "STRING",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SceneGate"
+      },
+      "widgets_values": [
+        0.5,
+        "send"
+      ],
+      "widgets_values_named": {
+        "min_confidence": 0.5,
+        "if_unclear": "send"
+      }
+    },
+    {
+      "id": 8,
+      "type": "PreviewAny",
+      "pos": [
+        1780,
+        260
+      ],
+      "size": [
+        300,
+        240
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "source",
+          "name": "source",
+          "type": "*",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Gate report",
+      "properties": {
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [],
+      "widgets_values_named": {}
+    },
+    {
+      "id": 9,
+      "type": "PadVideo",
+      "pos": [
+        2140,
+        80
+      ],
+      "size": [
+        340,
+        122
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 9
+        },
+        {
+          "localized_name": "min_frames",
+          "name": "min_frames",
+          "type": "INT",
+          "widget": {
+            "name": "min_frames"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "min_seconds",
+          "name": "min_seconds",
+          "type": "FLOAT",
+          "widget": {
+            "name": "min_seconds"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            10
+          ]
+        },
+        {
+          "localized_name": "original_frames",
+          "name": "original_frames",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "added_frames",
+          "name": "added_frames",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Pad to the model's minimum (Seedance edit: 4 s)",
+      "properties": {
+        "Node name for S&R": "PadVideo"
+      },
+      "widgets_values": [
+        0,
+        4
+      ],
+      "widgets_values_named": {
+        "min_frames": 0,
+        "min_seconds": 4
+      }
+    },
+    {
+      "id": 10,
+      "type": "ByteDance2ReferenceNodeV2",
+      "pos": [
+        2520,
+        80
+      ],
+      "size": [
+        420,
+        536
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "prompt",
+          "name": "model.prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "model.prompt"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "resolution",
+          "name": "model.resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.resolution"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "ratio",
+          "name": "model.ratio",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.ratio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "duration",
+          "name": "model.duration",
+          "type": "INT",
+          "widget": {
+            "name": "model.duration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "generate_audio",
+          "name": "model.generate_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "model.generate_audio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "task_type",
+          "name": "model.task_type",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.task_type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "output_format",
+          "name": "model.output_format",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.output_format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "image_1",
+          "name": "model.reference_images.image_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 11
+        },
+        {
+          "localized_name": "image_2",
+          "name": "model.reference_images.image_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "image_3",
+          "name": "model.reference_images.image_3",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "video_1",
+          "name": "model.reference_videos.video_1",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 10
+        },
+        {
+          "localized_name": "video_2",
+          "name": "model.reference_videos.video_2",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "localized_name": "audio_1",
+          "name": "model.reference_audios.audio_1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "localized_name": "asset_1",
+          "name": "model.reference_assets.asset_1",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "localized_name": "auto_downscale",
+          "name": "model.auto_downscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "model.auto_downscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "auto_upscale",
+          "name": "model.auto_upscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "model.auto_upscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "watermark",
+          "name": "watermark",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "watermark"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "VIDEO",
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            25
+          ]
+        },
+        {
+          "localized_name": "draft_task_id",
+          "name": "draft_task_id",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Seedance 2.5 swap (runs once per product scene)",
+      "properties": {
+        "Node name for S&R": "ByteDance2ReferenceNodeV2"
+      },
+      "widgets_values": [
+        "Seedance 2.5",
+        "Replace the product in the video with the product in image 1. Keep its exact shape, colours and label. Keep everything else unchanged: the people, hands, background, lighting, camera move and timing.",
+        "720p",
+        "16:9",
+        5,
+        false,
+        "edit",
+        "mp4",
+        true,
+        false,
+        1,
+        "fixed",
+        false
+      ],
+      "widgets_values_named": {
+        "model": "Seedance 2.5",
+        "model.prompt": "Replace the product in the video with the product in image 1. Keep its exact shape, colours and label. Keep everything else unchanged: the people, hands, background, lighting, camera move and timing.",
+        "model.resolution": "720p",
+        "model.ratio": "16:9",
+        "model.duration": 5,
+        "model.generate_audio": false,
+        "model.task_type": "edit",
+        "model.output_format": "mp4",
+        "model.auto_downscale": true,
+        "model.auto_upscale": false,
+        "seed": 1,
+        "control_after_generate": "fixed",
+        "watermark": false
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 11,
+      "type": "SaveVideo",
+      "pos": [
+        2980,
+        80
+      ],
+      "size": [
+        280,
+        106
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 28
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "format.codec",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format.codec"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "codec",
+          "shape": 7,
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "codec"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "title": "Save raw swaps (either model)",
+      "properties": {},
+      "widgets_values": [
+        "scene_swap/raw/swap",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "scene_swap/raw/swap",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto"
+      }
+    },
+    {
+      "id": 12,
+      "type": "JoinScenes",
+      "pos": [
+        2520,
+        800
+      ],
+      "size": [
+        300,
+        122
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "scenes",
+          "name": "scenes",
+          "type": "VIDEO",
+          "link": 13
+        },
+        {
+          "localized_name": "product_indices",
+          "name": "product_indices",
+          "type": "INT",
+          "link": 14
+        },
+        {
+          "localized_name": "replacements",
+          "name": "replacements",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 27
+        },
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "type": "COMBO",
+          "widget": {
+            "name": "audio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "fit",
+          "name": "fit",
+          "type": "COMBO",
+          "widget": {
+            "name": "fit"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            17
+          ]
+        },
+        {
+          "localized_name": "report",
+          "name": "report",
+          "type": "STRING",
+          "links": [
+            16
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "JoinScenes"
+      },
+      "widgets_values": [
+        "source",
+        "time"
+      ],
+      "widgets_values_named": {
+        "audio": "source",
+        "fit": "time"
+      }
+    },
+    {
+      "id": 13,
+      "type": "PreviewAny",
+      "pos": [
+        2520,
+        960
+      ],
+      "size": [
+        300,
+        220
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "source",
+          "name": "source",
+          "type": "*",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Join report",
+      "properties": {
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [],
+      "widgets_values_named": {}
+    },
+    {
+      "id": 14,
+      "type": "SaveVideo",
+      "pos": [
+        2980,
+        800
+      ],
+      "size": [
+        280,
+        106
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 17
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "format.codec",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format.codec"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "codec",
+          "shape": 7,
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "codec"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "title": "Final film",
+      "properties": {},
+      "widgets_values": [
+        "scene_swap/final",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "scene_swap/final",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto"
+      }
+    },
+    {
+      "id": 15,
+      "type": "SelectScene",
+      "pos": [
+        1320,
+        640
+      ],
+      "size": [
+        300,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "videos",
+          "name": "videos",
+          "type": "VIDEO",
+          "link": 18
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "title": "Look at one scene",
+      "properties": {
+        "Node name for S&R": "SelectScene"
+      },
+      "widgets_values": [
+        0
+      ],
+      "widgets_values_named": {
+        "index": 0
+      }
+    },
+    {
+      "id": 16,
+      "type": "SaveVideo",
+      "pos": [
+        1660,
+        640
+      ],
+      "size": [
+        300,
+        106
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 19
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "format.codec",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format.codec"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "codec",
+          "name": "codec",
+          "shape": 7,
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "codec"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "title": "Picked scene",
+      "properties": {},
+      "widgets_values": [
+        "scene_swap/picked/scene",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "scene_swap/picked/scene",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto"
+      }
+    },
+    {
+      "id": 17,
+      "type": "Note",
+      "pos": [
+        1320,
+        900
+      ],
+      "size": [
+        820,
+        330
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "How this works",
+      "properties": {},
+      "widgets_values": [
+        "1. Upload your video (Source video; trim it with Trim Video if needed) and a clear photo of the product (Product photo).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
+      ],
+      "widgets_values_named": {
+        "text": "1. Upload your video (Source video; trim it with Trim Video if needed) and a clear photo of the product (Product photo).\n2. Split Video by Scene cuts it into scenes. The contact sheet shows them numbered from 0.\n3. Gemini runs once per scene and answers whether the product is in it (JSON).\n4. Scene Gate passes only the product scenes on. With none, nothing after it runs.\n5. Pad Video brings short scenes up to the video model's minimum by repeating the last frame\n   (Seedance 2.5 edit needs 4-30 s; set 0 for a model with no minimum).\n6. The video model runs once per product scene, all at the same time. The switch picks it:\n   off = Seedance 2.5 edit (padded to 4 s), on = Wan 3.0 Reference to Video (no minimum,\n   max 15 s per scene; its duration is set per scene by Video Duration). Only the picked\n   model runs. Raw outputs are saved too.\n7. Join Scenes puts each swap back in its slot, keeps exactly the original frames\n   (padding dropped), resizes to the source and plays the source audio under everything.\n\nLook at one scene: un-bypass 'Look at one scene' + 'Picked scene' (Ctrl+B) and set the index.\nCosts: Gemini once per scene, Seedance once per product scene. Seeds are fixed, so\nre-queuing with nothing changed reuses the cached results."
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 18,
+      "type": "LoadVideo",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        282.798828125,
+        82
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "file",
+          "name": "file",
+          "type": "COMBO",
+          "widget": {
+            "name": "file"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "choose file to upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "VIDEO",
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "title": "Source video",
+      "properties": {
+        "Node name for S&R": "LoadVideo"
+      },
+      "widgets_values": [
+        "multi.mp4",
+        "image"
+      ],
+      "widgets_values_named": {
+        "file": "multi.mp4",
+        "upload": "image"
+      }
+    },
+    {
+      "id": 19,
+      "type": "Wan3ReferenceToVideoApi",
+      "pos": [
+        2520,
+        1360
+      ],
+      "size": [
+        420,
+        384
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "prompt",
+          "name": "model.prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "model.prompt"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "resolution",
+          "name": "model.resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.resolution"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "ratio",
+          "name": "model.ratio",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.ratio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "duration",
+          "name": "model.duration",
+          "type": "COMBO",
+          "widget": {
+            "name": "model.duration"
+          },
+          "link": 24
+        },
+        {
+          "localized_name": "audio",
+          "name": "model.audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "model.audio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "prompt_extend",
+          "name": "model.prompt_extend",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "model.prompt_extend"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "image1",
+          "name": "model.reference_images.image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 23
+        },
+        {
+          "localized_name": "image2",
+          "name": "model.reference_images.image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "video1",
+          "name": "model.reference_videos.video1",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 22
+        },
+        {
+          "localized_name": "video2",
+          "name": "model.reference_videos.video2",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "localized_name": "audio1",
+          "name": "model.reference_audios.audio1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "watermark",
+          "name": "watermark",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "watermark"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "VIDEO",
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            26
+          ]
+        }
+      ],
+      "title": "Wan 3.0 swap (runs once per product scene)",
+      "properties": {
+        "Node name for S&R": "Wan3ReferenceToVideoApi"
+      },
+      "widgets_values": [
+        "wan3.0-video",
+        "Replace the product in @Video1 with the product in @Image1. Keep its exact shape, colours and label. Keep everything else in @Video1 unchanged: the people, hands, background, lighting, camera move and timing.",
+        "720P",
+        "adaptive",
+        "auto",
+        false,
+        false,
+        1,
+        "fixed",
+        false
+      ],
+      "widgets_values_named": {
+        "model": "wan3.0-video",
+        "model.prompt": "Replace the product in @Video1 with the product in @Image1. Keep its exact shape, colours and label. Keep everything else in @Video1 unchanged: the people, hands, background, lighting, camera move and timing.",
+        "model.resolution": "720P",
+        "model.ratio": "adaptive",
+        "model.duration": "auto",
+        "model.audio": false,
+        "model.prompt_extend": false,
+        "seed": 1,
+        "control_after_generate": "fixed",
+        "watermark": false
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 20,
+      "type": "VideoDuration",
+      "pos": [
+        2140,
+        1360
+      ],
+      "size": [
+        320,
+        186
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "video",
+          "name": "video",
+          "type": "VIDEO",
+          "link": 21
+        },
+        {
+          "localized_name": "rounding",
+          "name": "rounding",
+          "type": "COMBO",
+          "widget": {
+            "name": "rounding"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "min_whole_seconds",
+          "name": "min_whole_seconds",
+          "type": "INT",
+          "widget": {
+            "name": "min_whole_seconds"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "max_whole_seconds",
+          "name": "max_whole_seconds",
+          "type": "INT",
+          "widget": {
+            "name": "max_whole_seconds"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "frames",
+          "name": "frames",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "seconds",
+          "name": "seconds",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "localized_name": "whole_seconds",
+          "name": "whole_seconds",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "whole_seconds_choice",
+          "name": "whole_seconds_choice",
+          "type": "COMBO",
+          "links": [
+            24
+          ]
+        },
+        {
+          "localized_name": "fps",
+          "name": "fps",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "title": "Scene length for Wan's duration",
+      "properties": {
+        "Node name for S&R": "VideoDuration"
+      },
+      "widgets_values": [
+        "up",
+        2,
+        15
+      ],
+      "widgets_values_named": {
+        "rounding": "up",
+        "min_whole_seconds": 2,
+        "max_whole_seconds": 15
+      }
+    },
+    {
+      "id": 21,
+      "type": "ComfySwitchNode",
+      "pos": [
+        2140,
+        800
+      ],
+      "size": [
+        320,
+        78
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 25
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": 26
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "VIDEO",
+          "links": [
+            27,
+            28
+          ]
+        }
+      ],
+      "title": "Video model: off = Seedance 2.5, on = Wan 3.0",
+      "properties": {
+        "Node name for S&R": "ComfySwitchNode"
+      },
+      "widgets_values": [
+        false
+      ],
+      "widgets_values_named": {
+        "switch": false
+      }
+    }
+  ],
+  "links": [
+    [
+      2,
+      2,
+      6,
+      3,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      2,
+      5,
+      4,
+      0,
+      "STRING"
+    ],
+    [
+      6,
+      2,
+      0,
+      7,
+      0,
+      "VIDEO"
+    ],
+    [
+      7,
+      6,
+      0,
+      7,
+      1,
+      "STRING"
+    ],
+    [
+      8,
+      7,
+      3,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      9,
+      7,
+      0,
+      9,
+      0,
+      "VIDEO"
+    ],
+    [
+      13,
+      2,
+      0,
+      12,
+      0,
+      "VIDEO"
+    ],
+    [
+      14,
+      7,
+      1,
+      12,
+      1,
+      "INT"
+    ],
+    [
+      16,
+      12,
+      1,
+      13,
+      0,
+      "STRING"
+    ],
+    [
+      18,
+      2,
+      0,
+      15,
+      0,
+      "VIDEO"
+    ],
+    [
+      20,
+      18,
+      0,
+      2,
+      0,
+      "VIDEO"
+    ],
+    [
+      17,
+      12,
+      0,
+      14,
+      0,
+      "VIDEO"
+    ],
+    [
+      19,
+      15,
+      0,
+      16,
+      0,
+      "VIDEO"
+    ],
+    [
+      5,
+      5,
+      0,
+      6,
+      2,
+      "IMAGE"
+    ],
+    [
+      4,
+      2,
+      0,
+      6,
+      5,
+      "VIDEO"
+    ],
+    [
+      11,
+      5,
+      0,
+      10,
+      8,
+      "IMAGE"
+    ],
+    [
+      10,
+      9,
+      0,
+      10,
+      11,
+      "VIDEO"
+    ],
+    [
+      21,
+      7,
+      0,
+      20,
+      0,
+      "VIDEO"
+    ],
+    [
+      23,
+      5,
+      0,
+      19,
+      7,
+      "IMAGE"
+    ],
+    [
+      22,
+      7,
+      0,
+      19,
+      9,
+      "VIDEO"
+    ],
+    [
+      24,
+      20,
+      3,
+      19,
+      4,
+      "COMBO"
+    ],
+    [
+      25,
+      10,
+      0,
+      21,
+      0,
+      "VIDEO"
+    ],
+    [
+      26,
+      19,
+      0,
+      21,
+      1,
+      "VIDEO"
+    ],
+    [
+      27,
+      21,
+      0,
+      12,
+      2,
+      "VIDEO"
+    ],
+    [
+      28,
+      21,
+      0,
+      11,
+      0,
+      "VIDEO"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 5,
+      "title": "1  Inputs + split into scenes",
+      "bounding": [
+        20,
+        -20,
+        1240,
+        1280
+      ],
+      "color": "#3f5159",
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "2  Find the product (LLM, once per scene)",
+      "bounding": [
+        1300,
+        -20,
+        800,
+        540
+      ],
+      "color": "#3f593f",
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "3  Swap with Seedance 2.5 (switch off)",
+      "bounding": [
+        2120,
+        -20,
+        1160,
+        700
+      ],
+      "color": "#593f3f",
+      "flags": {}
+    },
+    {
+      "id": 8,
+      "title": "4  Pick the model, join back into one film",
+      "bounding": [
+        2120,
+        720,
+        1160,
+        540
+      ],
+      "color": "#3f4f59",
+      "flags": {}
+    },
+    {
+      "id": 9,
+      "title": "Optional: look at one scene",
+      "bounding": [
+        1300,
+        570,
+        680,
+        230
+      ],
+      "color": "#444",
+      "flags": {}
+    },
+    {
+      "id": 10,
+      "title": "3b  Swap with Wan 3.0 (switch on)",
+      "bounding": [
+        2120,
+        1280,
+        1160,
+        640
+      ],
+      "color": "#59503f",
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.42,
+      "offset": [
+        20,
+        40
+      ]
+    }
+  },
+  "version": 0.4
+}

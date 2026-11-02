@@ -1,5 +1,8 @@
 # ComfyUI-VideoTrimmer
 
+Frame-exact video nodes: a timeline trimmer with a keyframe picker, and scene nodes that
+split a video at its cuts, route some scenes through a model and join them back.
+
 **Load Video (Trim + Keyframe)**: ComfyUI's Load Video with a timeline trimmer
 and a keyframe picker built into the node.
 
@@ -50,6 +53,104 @@ The preview plays the file in the browser. When the browser can't decode the cod
 (ProRes, for example), the preview switches to frames rendered by the server and
 playback is turned off; scrubbing and trimming still work.
 
+## Scene nodes
+
+Split a multi-scene video into one video per scene, send only some scenes through a
+model, and join everything back in order. Scene counts vary from video to video; the
+graph doesn't have to: the scenes come out as a **list**, and every ordinary node fed a
+list runs once per scene (async API nodes run the scenes concurrently).
+
+```
+Load Video (Trim) → Split Video by Scene ─┬─ scenes ─────────────────────────────────────┐
+                                          └→ LLM node: "is the product in it?"           │
+                                               ↓ verdicts (one per scene)                │
+                                           Scene Gate → product_scenes → Pad Video → video model
+                                               │ product_indices          (optional)     ↓ replacements
+                                               └───────────────────────────────→ Join Scenes → Save Video
+```
+
+`example_workflows/scene_product_swap.json` wires this up with Google Gemini as the LLM
+and two video models behind ComfyUI's If/Else Switch: Seedance 2.5 edit (switch off; Pad
+Video brings scenes up to its 4 s minimum) and Wan 3.0 Reference to Video (switch on; no
+minimum, 15 s maximum, Video Duration sets its output length per scene). The switch is
+lazy, so only the selected model runs. Its source is ComfyUI's own Load Video, so it
+also runs on Comfy Cloud, which only fetches uploads for the core loaders; locally, Load
+Video (Trim + Keyframe) can take its place. Any LLM node that returns text, and any video
+node that takes a VIDEO and returns one, can take their place.
+
+### Split Video by Scene
+
+| Input | Default | |
+|---|---|---|
+| `video` | | Any VIDEO. From Load Video (Trim), only the trimmed range is split |
+| `detector` | `all` | `content`: hard cuts (HSV change). `adaptive`: changes much bigger than the frames around them, so fast pans don't cut. `fade`: one cut in the middle of a run of black frames. `all`: every detector; any one can call a cut, near-duplicates merge, a fade replaces the jumps at its edges |
+| `content_threshold` | 27 | Mean HSV change (0-255) for a cut. Lower = more cuts |
+| `adaptive_threshold` | 3.0 | How many times the surrounding change a cut must be |
+| `fade_threshold` | 12 | Mean brightness (0-255) under which a frame is black |
+| `min_scene_length` | 12 | Frames. Shorter scenes merge away; a jump that comes back to the previous picture within this many frames is a flash, not a cut |
+| `trim_edges` | 0 | Frames dropped on each side of every cut (dissolve leftovers) |
+| `analysis_size` | 256 | Long side in px that detection looks at; outputs stay full size |
+| `cut_overrides` | | `+120, -340`: add a cut at frame 120, remove the one nearest 340 (source frames, from 1) |
+
+| Output | |
+|---|---|
+| `scenes` | VIDEO list. Each scene is a frame-exact window into the source (nothing decoded at full size, nothing re-encoded), with its audio |
+| `first_frames` | IMAGE list, each scene's first frame |
+| `start_frames`, `end_frames` | INT lists, source frames counted from 1, inclusive |
+| `scene_count` | INT |
+| `cut_list` | JSON: scenes with frames, timecodes, seconds; cuts with strength and the detectors that found them |
+| `contact_sheet` | IMAGE: every first frame in a grid, numbered from 0 (the scene index) |
+
+### Select Video from List
+
+Takes any VIDEO list and an `index` (from 0; negative counts from the end) and outputs
+that one video.
+
+### Scene Gate (product scenes)
+
+Routing only. Takes the scenes and one LLM answer per scene, in order. Reads JSON
+(`{"product": true, "confidence": 0.9, "why": "..."}`) or an answer starting with
+yes/no. `min_confidence` turns weak yeses into no; `if_unclear` sends, skips or stops on
+answers it can't read.
+
+Outputs the product scenes (list), their `product_indices` (list), `product_count`
+and a JSON `report` (every scene's verdict, confidence and length). With no product
+scenes, nothing after `product_scenes` runs.
+
+### Pad Video (repeat last frame)
+
+For models that need a minimum clip length. A video shorter than `min_frames` (or
+`min_seconds`, at its own frame rate; the longer of the two wins) gets its last frame
+repeated up to that length, audio padded with silence. Longer videos pass through
+untouched. Both 0 = off. Works on a list (each video padded on its own). Outputs the
+video, `original_frames` and `added_frames`. Example: Seedance 2.5 edit takes clips of
+4-30 s, so `min_seconds` 4 in front of it.
+
+### Video Duration
+
+Measures a video (or each video in a list): `frames`, `seconds`, `whole_seconds`
+(rounded `up`, `nearest` or `down`, clamped by `min_whole_seconds` / `max_whole_seconds`,
+0 = no clamp), the same value as text in `whole_seconds_choice` (a COMBO output, to drive a
+model node's duration dropdown per scene) and `fps`. Rounding up means a model asked for
+that many seconds covers every frame of the scene; Join Scenes drops the extra.
+
+### Join Scenes
+
+Takes the original `scenes`, `product_indices` and the model's `replacements` (in the
+gate's order). `replacements` is a lazy input: it is only evaluated when there are
+product scenes, so a video without the product never calls the model.
+
+Each replacement fills exactly its scene's frame count, so the cuts stay where they
+were. `fit` = `time` (default) takes the frames from the replacement's start at the
+scene's timing: padding from Pad Video and any extra length are dropped, a different
+frame rate is matched by time, and a replacement that comes back short holds its last
+frame. `stretch` maps the replacement's whole length onto the scene. Replacements are
+resized to the source's size (a different aspect ratio is stretched and noted in the
+`report`). The source audio plays under every scene.
+
+The film is written as lossless FFV1 + PCM to ComfyUI's temp folder; Save Video encodes
+it once for delivery. Scenes that weren't replaced decode bit-identical to the source.
+
 ## Install
 
 ```bash
@@ -59,3 +160,4 @@ git clone <this repo>
 
 No extra Python dependencies. Needs a ComfyUI recent enough to have the core
 **Trim Video** node (`VideoFromFile` with `start_time`/`duration`). Restart ComfyUI.
+The scene nodes were tested on ComfyUI 0.41.
