@@ -243,7 +243,7 @@ def _timecode(frame0, fps):
 
 
 def _contact_sheet(images, max_tile=320, columns=0):
-    """Grid of the scenes' first frames, each tile numbered from 0 (the scene index)."""
+    """Grid of the scenes' first frames, each tile numbered from 1 (Scene 1 = index 0)."""
     n = len(images)
     cols = columns or min(n, max(1, math.ceil(math.sqrt(n * 16 / 9 / (images[0].shape[1] / images[0].shape[0])))))
     rows = math.ceil(n / cols)
@@ -261,7 +261,7 @@ def _contact_sheet(images, max_tile=320, columns=0):
         tile = Image.fromarray((img.clamp(0, 1).mul(255).byte().cpu().numpy())).resize((tw, th), Image.LANCZOS)
         x, y = pad + (i % cols) * (tw + pad), pad + (i // cols) * (th + pad)
         sheet.paste(tile, (x, y))
-        label = str(i)
+        label = str(i + 1)
         box = draw.textbbox((0, 0), label, font=font)
         draw.rectangle([x, y, x + box[2] - box[0] + 10, y + box[3] - box[1] + 8], fill=(0, 0, 0))
         draw.text((x + 5 - box[0], y + 4 - box[1]), label, fill=(255, 255, 255), font=font)
@@ -275,23 +275,30 @@ def _first_frame(video):
     return images[:1].contiguous()
 
 
+VERDICT_KEYS = ("match", "selected", "edit", "product", "has_product", "present", "answer")
+
+
 def _parse_verdict(text, min_confidence):
-    """(has_product, confidence, note) from an LLM answer: JSON {product, confidence} or a yes/no word."""
+    """(yes/no or None, confidence, description) from an LLM answer.
+
+    Reads a JSON object ({"match": true, "confidence": 0.9, "description": "..."}; also the keys
+    selected, edit, product, has_product, present, answer) or an answer starting with yes/no.
+    """
     if isinstance(text, bool):
         return text, 1.0, ""
     raw = str(text or "").strip()
-    m = re.search(r"\{.*\}", raw, re.S)
-    if m:
+    data = _json_object(raw)
+    if data is not None:
+        value = next((data[k] for k in VERDICT_KEYS if k in data), None)
         try:
-            data = json.loads(m.group(0))
-            value = next((data[k] for k in ("product", "has_product", "present", "answer") if k in data), None)
             conf = float(data.get("confidence", 1.0))
-            if isinstance(value, str):
-                value = value.strip().lower() in ("yes", "true", "y", "1")
-            if value is not None:
-                return bool(value) and conf >= min_confidence, conf, str(data.get("why", ""))[:200]
-        except (ValueError, TypeError):
-            pass
+        except (TypeError, ValueError):
+            conf = 1.0
+        if isinstance(value, str):
+            value = value.strip().lower() in ("yes", "true", "y", "1")
+        note = str(data.get("description") or data.get("why") or "")[:600]
+        if value is not None:
+            return bool(value) and conf >= min_confidence, conf, note
     word = re.match(r"[\W_]*([a-z]+)", raw.lower())
     word = word.group(1) if word else ""
     if word in ("yes", "true", "y"):
@@ -299,6 +306,34 @@ def _parse_verdict(text, min_confidence):
     if word in ("no", "false", "n", "none"):
         return False, 1.0, ""
     return None, 0.0, raw[:200]
+
+
+def _json_object(raw):
+    """The first JSON object in a text (LLMs wrap it in prose or code fences), or None."""
+    start = raw.find("{")
+    while start != -1:
+        depth, in_str, esc = 0, False, False
+        for j in range(start, len(raw)):
+            ch = raw[j]
+            if in_str:
+                esc = (ch == "\\") and not esc
+                if ch == '"' and not esc:
+                    in_str = False
+                continue
+            if ch == '"':
+                in_str, esc = True, False
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        data = json.loads(raw[start:j + 1])
+                        return data if isinstance(data, dict) else None
+                    except ValueError:
+                        break
+        start = raw.find("{", start + 1)
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +384,7 @@ class SplitVideoByScene:
         "Last frame of each scene, inclusive, counted from 1 in the source file (list).",
         "Number of scenes.",
         "JSON: every scene's frames, timecodes and length, and the score and detectors of every cut.",
-        "Every scene's first frame in one grid, numbered from 0 = the scene index.",
+        "Every scene's first frame in one grid, numbered from 1 (Scene 1 = index 0).",
     )
     FUNCTION = "split"
     CATEGORY = "video"
@@ -426,7 +461,7 @@ class SplitVideoByScene:
             "fps": float(fps),
             "source_frames": [first + 1, last + 1],
             "detector": detector,
-            "scenes": [{"index": i, "start_frame": s, "end_frame": e, "frames": e - s + 1,
+            "scenes": [{"index": i, "scene": i + 1, "start_frame": s, "end_frame": e, "frames": e - s + 1,
                         "start_tc": _timecode(s - 1, fps), "end_tc": _timecode(e - 1, fps),
                         "seconds": round((e - s + 1) / float(fps), 3)}
                        for i, (s, e) in enumerate(zip(starts, ends))],
@@ -445,10 +480,10 @@ class SelectScene:
         return {
             "required": {
                 "videos": ("VIDEO", {"tooltip": "Any list of videos: the scenes from Split Video by Scene, the "
-                                                "product scenes from Scene Gate, a model's per-scene outputs..."}),
+                                                "selected scenes from Scene Gate, a model's per-scene outputs..."}),
                 "index": ("INT", {"default": 0, "min": -10_000, "max": 10_000,
-                                  "tooltip": "Video to pick, counted from 0 (the contact sheet's numbers). "
-                                             "Negative counts from the end (-1 = last)."}),
+                                  "tooltip": "Video to pick, counted from 0 (index 0 = Scene 1 on the contact "
+                                             "sheet). Negative counts from the end (-1 = last)."}),
             },
         }
 
@@ -473,53 +508,167 @@ class SceneGate:
         return {
             "required": {
                 "scenes": ("VIDEO", {"tooltip": "The scenes list from Split Video by Scene."}),
-                "verdicts": ("STRING", {"forceInput": True,
-                                        "tooltip": "One answer per scene, in scene order (an LLM node run on the scenes "
-                                                   "list). Reads JSON like {\"product\": true, \"confidence\": 0.9} or an "
-                                                   "answer starting with yes/no."}),
+                "filter": ("BOOLEAN", {"default": True,
+                                       "tooltip": "On: keep only the scenes whose verdict says yes. Off: pass every "
+                                                  "scene on (the verdicts aren't asked for, so the LLM doesn't run)."}),
                 "min_confidence": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.05,
-                                             "tooltip": "JSON answers below this confidence count as no product."}),
+                                             "tooltip": "JSON answers below this confidence count as no."}),
                 "if_unclear": (["send", "skip", "error"], {"default": "send",
                                                            "tooltip": "An answer that is neither yes nor no: send the scene "
-                                                                      "on (safer: a missed product costs a wrong film), skip "
-                                                                      "it, or stop the run."}),
+                                                                      "on, skip it, or stop the run."}),
+            },
+            "optional": {
+                "verdicts": ("STRING", {"forceInput": True, "lazy": True,
+                                        "tooltip": "One answer per scene (an LLM node run on the scenes list), or per "
+                                                   "scene in `indices`. Reads JSON like {\"match\": true, "
+                                                   "\"confidence\": 0.9, \"description\": \"...\"} (also the keys "
+                                                   "edit, product, selected...) or an answer starting with yes/no. "
+                                                   "Only evaluated when filter is on."}),
+                "indices": ("INT", {"forceInput": True,
+                                    "tooltip": "Optional: which scenes the verdicts are for (selected_indices of an "
+                                               "earlier Scene Gate). Chains two gates; outputs stay positions in "
+                                               "`scenes`. Empty = nothing to judge, the verdicts aren't asked for."}),
             },
         }
 
-    RETURN_TYPES = ("VIDEO", "INT", "INT", "STRING")
-    RETURN_NAMES = ("product_scenes", "product_indices", "product_count", "report")
-    OUTPUT_IS_LIST = (True, True, False, False)
+    RETURN_TYPES = ("VIDEO", "INT", "INT", "STRING", "STRING")
+    RETURN_NAMES = ("selected_scenes", "selected_indices", "count", "report", "answers")
+    OUTPUT_IS_LIST = (True, True, False, False, True)
     OUTPUT_TOOLTIPS = (
-        "The scenes with the product, in order (list). Nothing downstream runs when there are none.",
-        "Their positions in the scenes list, counted from 0 (list). Wire into Join Scenes.",
-        "How many scenes have the product.",
-        "JSON: every scene's verdict, confidence and length, and any unclear answers.",
+        "The selected scenes, in order (list). Nothing downstream runs when there are none.",
+        "Their positions in the scenes list, counted from 0 (list). Wire into Join Scenes or a next gate.",
+        "How many scenes were selected.",
+        "JSON: every scene's number, length, verdict, confidence and description. Feeds Scene Prompt Context.",
+        "The selected scenes' answers, as given (list; empty strings with filter off). Get JSON Field reads them.",
     )
     FUNCTION = "gate"
     CATEGORY = "video"
-    DESCRIPTION = ("Route the scenes an LLM said show the product on to the next model, "
-                   "and keep their positions so Join Scenes can put the results back.")
+    DESCRIPTION = ("Select scenes: all of them (filter off), or the ones an LLM said yes to. Keeps their positions "
+                   "so Join Scenes can put the results back.")
 
-    def gate(self, scenes, verdicts, min_confidence, if_unclear):
-        min_confidence, if_unclear = min_confidence[0], if_unclear[0]
-        if len(verdicts) != len(scenes):
-            raise ValueError(f"{len(verdicts)} verdicts for {len(scenes)} scenes: run the LLM node on the scenes list "
+    def check_lazy_status(self, scenes, filter, min_confidence, if_unclear, verdicts=None, indices=None):
+        # A lazy input not evaluated yet arrives as None, or [None] on a list node.
+        if not filter[0] or (verdicts is not None and any(v is not None for v in verdicts)):
+            return []
+        if indices is not None and len(indices) == 0:
+            return []
+        return ["verdicts"]
+
+    def gate(self, scenes, filter, min_confidence, if_unclear, verdicts=None, indices=None):
+        use_filter, min_confidence, if_unclear = filter[0], min_confidence[0], if_unclear[0]
+        pool = list(range(len(scenes))) if indices is None else list(indices)
+        bad = [i for i in pool if not 0 <= i < len(scenes)]
+        if bad:
+            raise ValueError(f"indices {bad} are outside the {len(scenes)} scenes.")
+        if use_filter and pool and (verdicts is None or len(verdicts) != len(pool)):
+            got = 0 if verdicts is None else len(verdicts)
+            raise ValueError(f"{got} verdicts for {len(pool)} scenes: run the LLM node on the same scenes list "
                              f"so it answers once per scene.")
-        picked, rows, warnings = [], [], []
-        for i, (scene, text) in enumerate(zip(scenes, verdicts)):
-            has, conf, note = _parse_verdict(text, min_confidence)
-            seconds = round(scene.get_duration(), 3)
-            if has is None:
-                if if_unclear == "error":
-                    raise ValueError(f"Scene {i}: can't read the answer as yes/no: {note!r}")
-                has = if_unclear == "send"
-                warnings.append(f"scene {i}: unclear answer, {'sent' if has else 'skipped'}")
+        picked, answers, rows, warnings = [], [], [], []
+        for k, i in enumerate(pool):
+            row = {"index": i, "scene": i + 1, "seconds": round(scenes[i].get_duration(), 3)}
+            if use_filter:
+                text = verdicts[k]
+                has, conf, note = _parse_verdict(text, min_confidence)
+                if has is None:
+                    if if_unclear == "error":
+                        raise ValueError(f"Scene {i + 1}: can't read the answer as yes/no: {note!r}")
+                    has = if_unclear == "send"
+                    warnings.append(f"scene {i + 1}: unclear answer, {'sent' if has else 'skipped'}")
+                row.update({"selected": has, "confidence": conf, "description": note, "answer": str(text)[:2000]})
+            else:
+                has, text = True, ""
+                row["selected"] = True
             if has:
                 picked.append(i)
-            rows.append({"index": i, "product": has, "confidence": conf, "seconds": seconds, "answer": str(text)[:300]})
-        report = json.dumps({"product_indices": picked, "scenes": rows, "warnings": warnings}, indent=2)
-        product_scenes = [scenes[i] for i in picked] or [ExecutionBlocker(None)]
-        return (product_scenes, picked, len(picked), report)
+                answers.append(str(text))
+            rows.append(row)
+        report = json.dumps({"filter": use_filter, "selected_indices": picked,
+                             "selected_scenes": [i + 1 for i in picked], "scene_count": len(scenes),
+                             "scenes": rows, "warnings": warnings}, indent=2)
+        selected = [scenes[i] for i in picked] or [ExecutionBlocker(None)]
+        return (selected, picked, len(picked), report, answers or [ExecutionBlocker(None)])
+
+
+class ScenePromptContext:
+    INPUT_IS_LIST = True
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "scenes": ("VIDEO", {"tooltip": "All scenes, from Split Video by Scene (for their lengths)."}),
+                "gate_report": ("STRING", {"forceInput": True,
+                                           "tooltip": "report of the Scene Gate whose selected scenes the prompts are "
+                                                      "for. Its descriptions (when it filtered) go into the context."}),
+                "request": ("STRING", {"multiline": True, "default": "",
+                                       "tooltip": "What the user wants, written once for the whole video. It may name "
+                                                  "scenes by number (from 1, as on the contact sheet) or by content."}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("contexts",)
+    OUTPUT_IS_LIST = (True,)
+    OUTPUT_TOOLTIPS = ("One text per selected scene, in the gate's order: the request, a list of every scene, and "
+                       "which scene this one is. The user message for a prompt-writing LLM run per scene.",)
+    FUNCTION = "build"
+    CATEGORY = "video"
+    DESCRIPTION = ("Give a per-scene LLM the whole picture: the user's request for the whole video, every scene "
+                   "(number, start, length, description) and which scene it is looking at.")
+
+    def build(self, scenes, gate_report, request):
+        report = json.loads(gate_report[0])
+        request = (request[0] or "").strip()
+        rows = {r["index"]: r for r in report.get("scenes", [])}
+        selected = report.get("selected_indices", [])
+        lines, start = [], 0.0
+        for i, scene in enumerate(scenes):
+            seconds = scene.get_duration()
+            row = rows.get(i, {})
+            mark = "to be edited" if i in selected else "not sent for editing"
+            desc = (row.get("description") or "").strip()
+            lines.append(f"Scene {i + 1}: starts {start:.1f} s, {seconds:.1f} s long, {mark}." + (f" {desc}" if desc else ""))
+            start += seconds
+        catalogue = "\n".join(lines)
+        out = []
+        for i in selected:
+            out.append(
+                f"EDIT REQUEST (written once by the user for the whole video):\n{request or '(none)'}\n\n"
+                f"ALL SCENES OF THE VIDEO (numbered from 1, as on the contact sheet):\n{catalogue}\n\n"
+                f"THIS CLIP: Scene {i + 1} ({scenes[i].get_duration():.1f} s). The attached video is this scene "
+                f"only. Write the editing prompt for this clip alone.")
+        return (out or [ExecutionBlocker(None)],)
+
+
+class GetJSONField:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": ("STRING", {"forceInput": True,
+                                    "tooltip": "Text holding a JSON object, e.g. an LLM answer (works per item on a list)."}),
+                "field": ("STRING", {"default": "prompt", "tooltip": "Key to read. Nested keys: a.b"}),
+                "if_missing": (["whole text", "empty", "error"], {"default": "error",
+                                                               "tooltip": "When there's no JSON or no such key."}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("value",)
+    FUNCTION = "get"
+    CATEGORY = "utils"
+    DESCRIPTION = "Read one field of a JSON object inside a text (an LLM answer), as text."
+
+    def get(self, text, field, if_missing):
+        value = _json_object(str(text or ""))
+        for key in [k for k in field.split(".") if k]:
+            value = value.get(key) if isinstance(value, dict) else None
+        if value is None:
+            if if_missing == "error":
+                raise ValueError(f"No field {field!r} in: {str(text)[:300]!r}")
+            return (str(text) if if_missing == "whole text" else "",)
+        return (value if isinstance(value, str) else json.dumps(value),)
 
 
 class PadVideo:
@@ -626,7 +775,8 @@ class JoinScenes:
             "required": {
                 "scenes": ("VIDEO", {"tooltip": "The original scenes list from Split Video by Scene."}),
                 "product_indices": ("INT", {"forceInput": True,
-                                            "tooltip": "From Scene Gate: where each replacement goes."}),
+                                            "tooltip": "selected_indices of the Scene Gate the replacements came "
+                                                       "through: where each replacement goes."}),
                 "audio": (["source", "none"], {"default": "source",
                                                "tooltip": "source: the original audio under every scene, replacements "
                                                           "included. none: no audio."}),
@@ -639,8 +789,8 @@ class JoinScenes:
             },
             "optional": {
                 "replacements": ("VIDEO", {"lazy": True,
-                                           "tooltip": "New versions of the product scenes, in Scene Gate's order "
-                                                      "(e.g. a video model's output). Only run when there are product scenes. "
+                                           "tooltip": "New versions of the selected scenes, in Scene Gate's order "
+                                                      "(e.g. a video model's output). Only run when scenes were selected. "
                                                       "Each is fitted to its scene's frame count, size and frame rate."}),
             },
         }
@@ -914,6 +1064,8 @@ NODE_CLASS_MAPPINGS = {
     "SplitVideoByScene": SplitVideoByScene,
     "SelectScene": SelectScene,
     "SceneGate": SceneGate,
+    "ScenePromptContext": ScenePromptContext,
+    "GetJSONField": GetJSONField,
     "PadVideo": PadVideo,
     "VideoDuration": VideoDuration,
     "JoinScenes": JoinScenes,
@@ -921,7 +1073,9 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "SplitVideoByScene": "Split Video by Scene",
     "SelectScene": "Select Video from List",
-    "SceneGate": "Scene Gate (product scenes)",
+    "SceneGate": "Scene Gate",
+    "ScenePromptContext": "Scene Prompt Context",
+    "GetJSONField": "Get JSON Field",
     "PadVideo": "Pad Video (repeat last frame)",
     "VideoDuration": "Video Duration",
     "JoinScenes": "Join Scenes",

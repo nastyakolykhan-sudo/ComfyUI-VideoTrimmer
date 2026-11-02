@@ -478,7 +478,7 @@
       ],
       "size": [
         300,
-        142
+        186
       ],
       "flags": {},
       "order": 8,
@@ -493,8 +493,25 @@
         {
           "localized_name": "verdicts",
           "name": "verdicts",
+          "shape": 7,
           "type": "STRING",
           "link": 7
+        },
+        {
+          "localized_name": "indices",
+          "name": "indices",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "localized_name": "filter",
+          "name": "filter",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "filter"
+          },
+          "link": null
         },
         {
           "localized_name": "min_confidence",
@@ -517,8 +534,8 @@
       ],
       "outputs": [
         {
-          "localized_name": "product_scenes",
-          "name": "product_scenes",
+          "localized_name": "selected_scenes",
+          "name": "selected_scenes",
           "shape": 6,
           "type": "VIDEO",
           "links": [
@@ -528,8 +545,8 @@
           ]
         },
         {
-          "localized_name": "product_indices",
-          "name": "product_indices",
+          "localized_name": "selected_indices",
+          "name": "selected_indices",
           "shape": 6,
           "type": "INT",
           "links": [
@@ -537,8 +554,8 @@
           ]
         },
         {
-          "localized_name": "product_count",
-          "name": "product_count",
+          "localized_name": "count",
+          "name": "count",
           "type": "INT",
           "links": null
         },
@@ -549,16 +566,26 @@
           "links": [
             8
           ]
+        },
+        {
+          "localized_name": "answers",
+          "name": "answers",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
         }
       ],
+      "title": "Scene Gate (product scenes)",
       "properties": {
         "Node name for S&R": "SceneGate"
       },
       "widgets_values": [
+        true,
         0.5,
         "send"
       ],
       "widgets_values_named": {
+        "filter": true,
         "min_confidence": 0.5,
         "if_unclear": "send"
       }
@@ -608,7 +635,7 @@
         80
       ],
       "size": [
-        340,
+        364.6822265625,
         122
       ],
       "flags": {},
@@ -1357,7 +1384,7 @@
       ],
       "size": [
         282.798828125,
-        82
+        233.0743408203125
       ],
       "flags": {},
       "order": 2,
@@ -1414,7 +1441,7 @@
       ],
       "size": [
         420,
-        384
+        404
       ],
       "flags": {},
       "order": 14,
@@ -1493,6 +1520,13 @@
         {
           "localized_name": "image2",
           "name": "model.reference_images.image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "image3",
+          "name": "model.reference_images.image3",
           "shape": 7,
           "type": "IMAGE",
           "link": null
@@ -1684,7 +1718,7 @@
         800
       ],
       "size": [
-        320,
+        352.30234375,
         78
       ],
       "flags": {},
@@ -1828,6 +1862,46 @@
       "VIDEO"
     ],
     [
+      21,
+      7,
+      0,
+      20,
+      0,
+      "VIDEO"
+    ],
+    [
+      25,
+      10,
+      0,
+      21,
+      0,
+      "VIDEO"
+    ],
+    [
+      26,
+      19,
+      0,
+      21,
+      1,
+      "VIDEO"
+    ],
+    [
+      27,
+      21,
+      0,
+      12,
+      2,
+      "VIDEO"
+    ],
+    [
+      28,
+      21,
+      0,
+      11,
+      0,
+      "VIDEO"
+    ],
+    [
       17,
       12,
       0,
@@ -1876,12 +1950,12 @@
       "VIDEO"
     ],
     [
-      21,
-      7,
-      0,
+      24,
       20,
-      0,
-      "VIDEO"
+      3,
+      19,
+      4,
+      "COMBO"
     ],
     [
       23,
@@ -1896,47 +1970,7 @@
       7,
       0,
       19,
-      9,
-      "VIDEO"
-    ],
-    [
-      24,
-      20,
-      3,
-      19,
-      4,
-      "COMBO"
-    ],
-    [
-      25,
       10,
-      0,
-      21,
-      0,
-      "VIDEO"
-    ],
-    [
-      26,
-      19,
-      0,
-      21,
-      1,
-      "VIDEO"
-    ],
-    [
-      27,
-      21,
-      0,
-      12,
-      2,
-      "VIDEO"
-    ],
-    [
-      28,
-      21,
-      0,
-      11,
-      0,
       "VIDEO"
     ]
   ],

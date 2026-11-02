@@ -55,28 +55,50 @@ playback is turned off; scrubbing and trimming still work.
 
 ## Scene nodes
 
-Split a multi-scene video into one video per scene, send only some scenes through a
-model, and join everything back in order. Scene counts vary from video to video; the
-graph doesn't have to: the scenes come out as a **list**, and every ordinary node fed a
-list runs once per scene (async API nodes run the scenes concurrently).
+Split a multi-scene video into one video per scene, choose which scenes to edit, edit
+them with any video model and join everything back in order. Scene counts vary from
+video to video; the graph doesn't have to: the scenes come out as a **list**, and every
+ordinary node fed a list runs once per scene (async API nodes run the scenes
+concurrently).
 
 ```
-Load Video (Trim) → Split Video by Scene ─┬─ scenes ─────────────────────────────────────┐
-                                          └→ LLM node: "is the product in it?"           │
-                                               ↓ verdicts (one per scene)                │
-                                           Scene Gate → product_scenes → Pad Video → video model
-                                               │ product_indices          (optional)     ↓ replacements
-                                               └───────────────────────────────→ Join Scenes → Save Video
+Load Video → Split Video by Scene ─┬─ scenes ──────────────────────────────────────────────┐
+                                   ├→ filter LLM (per scene) ─→ Scene Gate (filter on/off)  │
+                                   │                              │ selected scenes        │
+                                   │      Scene Prompt Context ←──┘ + report               │
+                                   │               ↓ one context per scene                 │
+                                   │      prompt-writer LLM (per scene) → Scene Gate         │
+                                   │                 (edit yes/no)        │ scenes to edit  │
+                                   │      Get JSON Field (prompt) → video model (per scene) │
+                                   │                                      ↓ replacements    │
+                                   └───────────────────────────────→ Join Scenes → Save Video
 ```
 
-`example_workflows/scene_product_swap.json` wires this up with Google Gemini as the LLM
-and two video models behind ComfyUI's If/Else Switch: Seedance 2.5 edit (switch off; Pad
-Video brings scenes up to its 4 s minimum) and Wan 3.0 Reference to Video (switch on; no
-minimum, 15 s maximum, Video Duration sets its output length per scene). The switch is
-lazy, so only the selected model runs. Its source is ComfyUI's own Load Video, so it
-also runs on Comfy Cloud, which only fetches uploads for the core loaders; locally, Load
-Video (Trim + Keyframe) can take its place. Any LLM node that returns text, and any video
-node that takes a VIDEO and returns one, can take their place.
+`example_workflows/scene_edit_wan.json` is the general version. Four inputs:
+
+- **Filter** (on/off) and **Filter Prompt**: on, a Gemini node watches every scene and keeps
+  the ones that match the prompt (a product, people, nature, furniture, anything). Off,
+  every scene goes on and that LLM doesn't run.
+- **Edit Prompt**: what to change, written once for the whole video. It can name scenes
+  ("in scene 3...") or describe them. A second Gemini node runs once per remaining scene.
+  Scene Prompt Context gives it the request, every scene's number, timing and description
+  and which scene it's looking at; it also sees the contact sheet and the reference image.
+  It writes a self-contained Wan 3.0 prompt (what changes, and everything that stays the
+  same), or decides that this scene needs no edit.
+- **Reference image** (optional; bypass the node if there's none).
+
+Wan 3.0 Reference to Video then edits each chosen scene (`@Video1` = the scene, `@Image1`
+= the reference), with its duration set per scene by Video Duration, and Join Scenes puts
+the results back. The reports show every decision and prompt.
+
+`example_workflows/scene_product_swap.json` is the earlier, simpler version: one LLM yes/no
+per scene, then Seedance 2.5 edit or Wan 3.0 behind ComfyUI's If/Else Switch (only the
+selected model runs; Pad Video brings scenes up to Seedance's 4 s minimum).
+
+Both use ComfyUI's own Load Video as the source, so they run on Comfy Cloud, which only
+fetches uploads for the core loaders; locally, Load Video (Trim + Keyframe) can take its
+place. Any LLM node that returns text, and any video node that takes a VIDEO and returns
+one, can stand in for Gemini and Wan.
 
 ### Split Video by Scene
 
@@ -99,23 +121,42 @@ node that takes a VIDEO and returns one, can take their place.
 | `start_frames`, `end_frames` | INT lists, source frames counted from 1, inclusive |
 | `scene_count` | INT |
 | `cut_list` | JSON: scenes with frames, timecodes, seconds; cuts with strength and the detectors that found them |
-| `contact_sheet` | IMAGE: every first frame in a grid, numbered from 0 (the scene index) |
+| `contact_sheet` | IMAGE: every first frame in a grid, numbered from 1 (Scene 1 = list index 0) |
 
 ### Select Video from List
 
-Takes any VIDEO list and an `index` (from 0; negative counts from the end) and outputs
-that one video.
+Takes any VIDEO list and an `index` (from 0, so index 0 = Scene 1; negative counts from the
+end) and outputs that one video.
 
-### Scene Gate (product scenes)
+### Scene Gate
 
-Routing only. Takes the scenes and one LLM answer per scene, in order. Reads JSON
-(`{"product": true, "confidence": 0.9, "why": "..."}`) or an answer starting with
-yes/no. `min_confidence` turns weak yeses into no; `if_unclear` sends, skips or stops on
-answers it can't read.
+Selects scenes. With `filter` off it passes every scene on and never asks for its
+`verdicts`, so the LLM behind them doesn't run. With `filter` on it keeps the scenes
+whose verdict says yes: JSON like `{"match": true, "confidence": 0.9, "description": "..."}`
+(the keys `selected`, `edit`, `product`... work too; LLM answers wrapped in prose or code
+fences are fine) or an answer starting with yes/no. `min_confidence` turns weak yeses into
+no; `if_unclear` sends, skips or stops on answers it can't read.
 
-Outputs the product scenes (list), their `product_indices` (list), `product_count`
-and a JSON `report` (every scene's verdict, confidence and length). With no product
-scenes, nothing after `product_scenes` runs.
+Outputs the `selected_scenes` (list), their `selected_indices` (positions in `scenes`,
+list), `count`, a JSON `report` (every scene's number, length, verdict, confidence and
+description) and the selected scenes' `answers` (list). With nothing selected, nothing
+after `selected_scenes` / `answers` runs.
+
+**Chaining:** a second gate takes the same `scenes`, the first gate's `selected_indices` as
+`indices`, and verdicts for just those scenes. Its outputs are still positions in the full
+scenes list, so they go straight into Join Scenes; an empty `indices` means nothing to judge.
+
+### Scene Prompt Context
+
+Builds the user message for an LLM that runs once per scene: the `request` (written once for
+the whole video), every scene's number, start, length and description (from a gate's
+`report`), which scenes are selected, and which scene this one is. One text per selected
+scene, in the gate's order, so it pairs with that gate's `selected_scenes`.
+
+### Get JSON Field
+
+Reads one field (`prompt` by default; `a.b` for nested keys) of the JSON object inside a
+text, such as an LLM answer, and outputs it as text. Works per item on a list.
 
 ### Pad Video (repeat last frame)
 
@@ -136,9 +177,10 @@ that many seconds covers every frame of the scene; Join Scenes drops the extra.
 
 ### Join Scenes
 
-Takes the original `scenes`, `product_indices` and the model's `replacements` (in the
-gate's order). `replacements` is a lazy input: it is only evaluated when there are
-product scenes, so a video without the product never calls the model.
+Takes the original `scenes`, the gate's `selected_indices` (input `product_indices`) and
+the model's `replacements` (in the gate's order). `replacements` is a lazy input: it is
+only evaluated when scenes were selected, so when nothing is selected the model never
+runs and the film comes back untouched.
 
 Each replacement fills exactly its scene's frame count, so the cuts stay where they
 were. `fit` = `time` (default) takes the frames from the replacement's start at the
