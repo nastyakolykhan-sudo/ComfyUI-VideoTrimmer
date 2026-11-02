@@ -89,7 +89,12 @@ Load Video → Split Video by Scene ─┬─ scenes ─────────
 
 Wan 3.0 Reference to Video then edits each chosen scene (`@Video1` = the scene, `@Image1`
 = the reference), with its duration set per scene by Video Duration, and Join Scenes puts
-the results back. The reports show every decision and prompt.
+the results back. The **Review sheet** at the bottom shows every decision, its reason and
+every Wan prompt in full, and saves the same page as Markdown in `output/scene_edit/`.
+
+The filter is told to lean towards yes: a scene it isn't sure about passes with a lower
+confidence, since a missed scene can't be recovered while an extra one only costs a writer
+call (and the writer can still keep it as it is). A product doesn't need a readable label.
 
 `example_workflows/scene_product_swap.json` is the earlier, simpler version: one LLM yes/no
 per scene, then Seedance 2.5 edit or Wan 3.0 behind ComfyUI's If/Else Switch (only the
@@ -152,6 +157,15 @@ Builds the user message for an LLM that runs once per scene: the `request` (writ
 the whole video), every scene's number, start, length and description (from a gate's
 `report`), which scenes are selected, and which scene this one is. One text per selected
 scene, in the gate's order, so it pairs with that gate's `selected_scenes`.
+
+### Scene Review Sheet
+
+One readable page per run, for reviewing results and refining the LLM instructions: a
+summary (what the first gate kept, what the second chose to edit, the instructions they
+were given), then every scene with its timing, the first gate's yes/no, confidence,
+description and reason, the second gate's decision and reason, and the generated prompt
+(the `prompt` field of its answer) in full. It always runs, even when nothing was
+selected, and saves the page as Markdown in the output folder (`filename_prefix`).
 
 ### Get JSON Field
 

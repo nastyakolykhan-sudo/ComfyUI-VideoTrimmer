@@ -296,7 +296,7 @@ def _parse_verdict(text, min_confidence):
             conf = 1.0
         if isinstance(value, str):
             value = value.strip().lower() in ("yes", "true", "y", "1")
-        note = str(data.get("description") or data.get("why") or "")[:600]
+        note = str(data.get("description") or data.get("why") or "")[:1000]
         if value is not None:
             return bool(value) and conf >= min_confidence, conf, note
     word = re.match(r"[\W_]*([a-z]+)", raw.lower())
@@ -575,7 +575,11 @@ class SceneGate:
                         raise ValueError(f"Scene {i + 1}: can't read the answer as yes/no: {note!r}")
                     has = if_unclear == "send"
                     warnings.append(f"scene {i + 1}: unclear answer, {'sent' if has else 'skipped'}")
-                row.update({"selected": has, "confidence": conf, "description": note, "answer": str(text)[:2000]})
+                data = _json_object(str(text)) or {}
+                row.update({"selected": has, "confidence": conf,
+                            "description": str(data.get("description") or "")[:1000],
+                            "why": str(data.get("why") or ("" if data else note))[:1000],
+                            "answer": str(text)[:6000]})
             else:
                 has, text = True, ""
                 row["selected"] = True
@@ -583,11 +587,19 @@ class SceneGate:
                 picked.append(i)
                 answers.append(str(text))
             rows.append(row)
-        report = json.dumps({"filter": use_filter, "selected_indices": picked,
+        judged = [i + 1 for i in pool]
+        summary = (f"{len(scenes)} scenes. " +
+                   (f"Judged: {_scene_list(judged)}. Selected: {_scene_list([i + 1 for i in picked])}."
+                    if use_filter else f"No filtering: all {len(pool)} passed on."))
+        report = json.dumps({"summary": summary, "filter": use_filter, "selected_indices": picked,
                              "selected_scenes": [i + 1 for i in picked], "scene_count": len(scenes),
                              "scenes": rows, "warnings": warnings}, indent=2)
         selected = [scenes[i] for i in picked] or [ExecutionBlocker(None)]
         return (selected, picked, len(picked), report, answers or [ExecutionBlocker(None)])
+
+
+def _scene_list(numbers):
+    return ", ".join(f"scene {n}" for n in numbers) if numbers else "none"
 
 
 class ScenePromptContext:
@@ -639,6 +651,108 @@ class ScenePromptContext:
                 f"THIS CLIP: Scene {i + 1} ({scenes[i].get_duration():.1f} s). The attached video is this scene "
                 f"only. Write the editing prompt for this clip alone.")
         return (out or [ExecutionBlocker(None)],)
+
+
+class SceneReviewSheet:
+    INPUT_IS_LIST = True
+    OUTPUT_NODE = True
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "scenes": ("VIDEO", {"tooltip": "All scenes, from Split Video by Scene (for their timings)."}),
+                "first_report": ("STRING", {"forceInput": True,
+                                            "tooltip": "report of the first Scene Gate (e.g. the filter)."}),
+                "save": ("BOOLEAN", {"default": True,
+                                     "tooltip": "Also write the sheet as a Markdown file to the output folder."}),
+                "filename_prefix": ("STRING", {"default": "scene_edit/review"}),
+            },
+            "optional": {
+                "second_report": ("STRING", {"forceInput": True,
+                                             "tooltip": "report of a second Scene Gate (e.g. the prompt writer's "
+                                                        "edit decisions); its answers' prompt fields are shown in full."}),
+                "first_label": ("STRING", {"default": "Filter", "tooltip": "What the first gate is called on the sheet."}),
+                "second_label": ("STRING", {"default": "Writer", "tooltip": "What the second gate is called."}),
+                "first_prompt": ("STRING", {"forceInput": True, "tooltip": "The first LLM's instruction (e.g. Filter "
+                                                                          "Prompt), shown at the top."}),
+                "second_prompt": ("STRING", {"forceInput": True, "tooltip": "The second LLM's instruction (e.g. Edit "
+                                                                           "Prompt), shown at the top."}),
+                "prompt_field": ("STRING", {"default": "prompt",
+                                            "tooltip": "Field of the second gate's answers printed in full."}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("sheet",)
+    OUTPUT_TOOLTIPS = ("The review sheet as text (Markdown).",)
+    FUNCTION = "build"
+    CATEGORY = "video"
+    DESCRIPTION = ("One readable page per run: every scene with its timing, each gate's decision and reason, and "
+                   "the generated prompt in full. Shown on a Preview node and saved as Markdown, for reviewing "
+                   "and refining the LLM instructions.")
+
+    def build(self, scenes, first_report, save, filename_prefix, second_report=None, first_label=None,
+              second_label=None, first_prompt=None, second_prompt=None, prompt_field=None):
+        one = lambda v, d: (v[0] if v else d) if isinstance(v, list) else (v if v is not None else d)
+        r1 = json.loads(one(first_report, "{}"))
+        r2 = json.loads(one(second_report, "{}") or "{}")
+        l1, l2 = one(first_label, "Filter") or "Filter", one(second_label, "Writer") or "Writer"
+        p1, p2 = one(first_prompt, ""), one(second_prompt, "")
+        field = one(prompt_field, "prompt") or "prompt"
+        rows1 = {r["index"]: r for r in r1.get("scenes", [])}
+        rows2 = {r["index"]: r for r in r2.get("scenes", [])}
+        sel1, sel2 = r1.get("selected_indices", []), r2.get("selected_indices", [])
+
+        out = [f"# Scene review: {len(scenes)} scenes", ""]
+        if r1.get("filter", True):
+            out.append(f"- **{l1}:** on" + (f' ("{p1.strip()}")' if p1 else "") +
+                       f". Kept: {_scene_list([i + 1 for i in sel1])}.")
+        else:
+            out.append(f"- **{l1}:** off. Every scene passed on.")
+        if r2:
+            out.append(f"- **{l2}:** to edit: {_scene_list([i + 1 for i in sel2])}.")
+        if p2:
+            out += ["", f"**Request to the {l2.lower()}:** {p2.strip()}"]
+        start = 0.0
+        for i, scene in enumerate(scenes):
+            sec = scene.get_duration()
+            out += ["", f"## Scene {i + 1} · {start:.1f}-{start + sec:.1f} s ({sec:.1f} s)"]
+            start += sec
+            a = rows1.get(i)
+            if a is not None and "confidence" in a:
+                out.append(f"- **{l1}:** {'yes' if a['selected'] else 'no'} (confidence {a['confidence']:.2f})")
+                if a.get("description"):
+                    out.append(f"  - {a['description']}")
+                if a.get("why"):
+                    out.append(f"  - Why: {a['why']}")
+            elif a is not None:
+                out.append(f"- **{l1}:** off, passed on")
+            b = rows2.get(i)
+            if b is None:
+                if r2:
+                    out.append(f"- **{l2}:** not asked (didn't pass {l1.lower()})")
+                continue
+            out.append(f"- **{l2}:** {'edit' if b.get('selected') else 'keep as it is'}"
+                       + (f" (confidence {b['confidence']:.2f})" if b.get("confidence", 1) < 1 else ""))
+            if b.get("why"):
+                out.append(f"  - Why: {b['why']}")
+            prompt = (_json_object(b.get("answer", "")) or {}).get(field)
+            if b.get("selected") and prompt:
+                out += ["", f"**{field.capitalize()}:**", "", "```", str(prompt).strip(), "```"]
+            elif not prompt and b.get("answer"):
+                out += ["", "Raw answer:", "", "```", b["answer"].strip(), "```"]
+        sheet = "\n".join(out) + "\n"
+
+        ui = {}
+        if one(save, True):
+            folder, name, counter, subfolder, _ = folder_paths.get_save_image_path(
+                one(filename_prefix, "scene_edit/review"), folder_paths.get_output_directory())
+            path = os.path.join(folder, f"{name}_{counter:05}_.md")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(sheet)
+            ui = {"text": [f"Saved {os.path.join(subfolder, os.path.basename(path))}"]}
+        return {"ui": ui, "result": (sheet,)}
 
 
 class GetJSONField:
@@ -1066,6 +1180,7 @@ NODE_CLASS_MAPPINGS = {
     "SceneGate": SceneGate,
     "ScenePromptContext": ScenePromptContext,
     "GetJSONField": GetJSONField,
+    "SceneReviewSheet": SceneReviewSheet,
     "PadVideo": PadVideo,
     "VideoDuration": VideoDuration,
     "JoinScenes": JoinScenes,
@@ -1076,6 +1191,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SceneGate": "Scene Gate",
     "ScenePromptContext": "Scene Prompt Context",
     "GetJSONField": "Get JSON Field",
+    "SceneReviewSheet": "Scene Review Sheet",
     "PadVideo": "Pad Video (repeat last frame)",
     "VideoDuration": "Video Duration",
     "JoinScenes": "Join Scenes",
