@@ -124,6 +124,7 @@ takes a VIDEO and returns one, can stand in for Gemini and Wan.
 | `adaptive_threshold` | 3.0 | How many times the surrounding change a cut must be |
 | `fade_threshold` | 12 | Mean brightness (0-255) under which a frame is black |
 | `min_scene_length` | 12 | Frames. Shorter scenes merge away; a jump that comes back to the previous picture within this many frames is a flash, not a cut |
+| `min_scene_seconds` | 0 | Shortest scene in seconds, turned into frames at the video's own frame rate (1 s = 24 frames at 24 fps, 30 at 30 fps); the longer of this and `min_scene_length` wins. For models that can't take shorter clips. 0 = off |
 | `trim_edges` | 0 | Frames dropped on each side of every cut (dissolve leftovers) |
 | `analysis_size` | 256 | Long side in px that detection looks at; outputs stay full size |
 | `cut_overrides` | | `+120, -340`: add a cut at frame 120, remove the one nearest 340 (source frames, from 1) |

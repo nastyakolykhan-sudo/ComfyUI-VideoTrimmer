@@ -413,6 +413,12 @@ class SplitVideoByScene:
                                                         "at the end of the previous one). end: right after the change, "
                                                         "so it stays with the previous scene. Fades through black "
                                                         "always cut in the middle of the black."}),
+                "min_scene_seconds": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 600.0, "step": 0.1,
+                                                "tooltip": "Shortest scene in seconds, turned into frames at the "
+                                                           "video's own frame rate (1 s = 24 frames at 24 fps, 30 at "
+                                                           "30 fps). The longer of this and min_scene_length wins. "
+                                                           "Use it when the next model can't take shorter clips. "
+                                                           "0 = off."}),
             },
         }
 
@@ -434,7 +440,8 @@ class SplitVideoByScene:
                    "into the source: nothing is re-encoded. Frame numbers start at 1.")
 
     def split(self, video, detector, content_threshold, adaptive_threshold, fade_threshold,
-              min_scene_length, trim_edges, analysis_size, cut_overrides, transition="peak"):
+              min_scene_length, trim_edges, analysis_size, cut_overrides, transition="peak",
+              min_scene_seconds=0.0):
         source = _file_source(video)
         if source is not None:
             path, info, first, last, crop = source
@@ -450,6 +457,8 @@ class SplitVideoByScene:
             fps = components.frame_rate
 
         n = last - first + 1
+        if min_scene_seconds:
+            min_scene_length = max(min_scene_length, math.ceil(round(min_scene_seconds * float(fps), 6)))
         cuts, scores = detect_cuts(hsv, detector, content_threshold, adaptive_threshold, fade_threshold,
                                    min_scene_length)
         cuts = _place_in_transition(cuts, scores, transition, content_threshold, min_scene_length)
@@ -509,6 +518,7 @@ class SplitVideoByScene:
                         "seconds": round((e - s + 1) / float(fps), 3)}
                        for i, (s, e) in enumerate(zip(starts, ends))],
             "transition": transition,
+            "min_scene_frames": min_scene_length,
             "cuts": [{"frame": first + c["frame"] + 1, "tc": _timecode(first + c["frame"], fps),
                       "strength": c["strength"], "detectors": c["detectors"],
                       **({"moved_from": first + c["moved_from"] + 1} if "moved_from" in c else {})} for c in cuts],
