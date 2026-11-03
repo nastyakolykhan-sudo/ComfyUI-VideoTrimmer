@@ -1,8 +1,8 @@
 {
   "id": "5dd31c60-23df-4aa2-8964-998da42f627a",
   "revision": 0,
-  "last_node_id": 37,
-  "last_link_id": 55,
+  "last_node_id": 39,
+  "last_link_id": 57,
   "nodes": [
     {
       "id": 6,
@@ -13,10 +13,10 @@
       ],
       "size": [
         300,
-        346
+        370
       ],
       "flags": {},
-      "order": 9,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -95,7 +95,16 @@
           "widget": {
             "name": "cut_overrides"
           },
-          "link": null
+          "link": 57
+        },
+        {
+          "localized_name": "transition",
+          "name": "transition",
+          "type": "COMBO",
+          "widget": {
+            "name": "transition"
+          },
+          "link": 56
         }
       ],
       "outputs": [
@@ -170,7 +179,8 @@
         12,
         0,
         256,
-        ""
+        "",
+        "peak"
       ],
       "widgets_values_named": {
         "detector": "all",
@@ -180,7 +190,8 @@
         "min_scene_length": 12,
         "trim_edges": 0,
         "analysis_size": 256,
-        "cut_overrides": ""
+        "cut_overrides": "",
+        "transition": "peak"
       }
     },
     {
@@ -195,7 +206,7 @@
         320
       ],
       "flags": {},
-      "order": 11,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -225,14 +236,14 @@
       "type": "PreviewImage",
       "pos": [
         1020,
-        470
+        500
       ],
       "size": [
         640,
-        370
+        340
       ],
       "flags": {},
-      "order": 12,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -267,7 +278,7 @@
         390
       ],
       "flags": {},
-      "order": 10,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -420,7 +431,7 @@
         206
       ],
       "flags": {},
-      "order": 14,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -547,7 +558,7 @@
         200
       ],
       "flags": {},
-      "order": 15,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -605,7 +616,7 @@
         410
       ],
       "flags": {},
-      "order": 16,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -758,7 +769,7 @@
         206
       ],
       "flags": {},
-      "order": 17,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -889,7 +900,7 @@
         82
       ],
       "flags": {},
-      "order": 20,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -952,7 +963,7 @@
         186
       ],
       "flags": {},
-      "order": 18,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -1050,7 +1061,7 @@
         424
       ],
       "flags": {},
-      "order": 22,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
@@ -1231,7 +1242,7 @@
         122
       ],
       "flags": {},
-      "order": 23,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -1314,7 +1325,7 @@
         220
       ],
       "flags": {},
-      "order": 26,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -1378,7 +1389,7 @@
         234
       ],
       "flags": {},
-      "order": 19,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -1504,7 +1515,7 @@
         680
       ],
       "flags": {},
-      "order": 21,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -2492,7 +2503,7 @@
       "type": "WorkflowIOEnumInput",
       "pos": [
         480,
-        858
+        1594
       ],
       "size": [
         400,
@@ -2594,7 +2605,7 @@
           ]
         }
       ],
-      "title": "12. resolution (advanced)",
+      "title": "14. resolution (advanced)",
       "properties": {
         "Node name for S&R": "WorkflowIOEnumInput"
       },
@@ -2607,7 +2618,7 @@
         "720P",
         true,
         "Video model",
-        12
+        14
       ],
       "widgets_values_named": {
         "param_name": "resolution",
@@ -2618,7 +2629,7 @@
         "example": "720P",
         "advanced": true,
         "group": "Video model",
-        "order": 12
+        "order": 14
       }
     },
     {
@@ -2633,7 +2644,7 @@
         150
       ],
       "flags": {},
-      "order": 25,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
@@ -2723,7 +2734,7 @@
         150
       ],
       "flags": {},
-      "order": 24,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
@@ -2806,14 +2817,14 @@
       "type": "WorkflowIOImageOutput",
       "pos": [
         1020,
-        880
+        890
       ],
       "size": [
         274.6265625,
         150
       ],
       "flags": {},
-      "order": 13,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -2889,6 +2900,263 @@
         "filename_template": "",
         "format": "jpg",
         "include": true
+      }
+    },
+    {
+      "id": 38,
+      "type": "WorkflowIOEnumInput",
+      "pos": [
+        480,
+        858
+      ],
+      "size": [
+        400,
+        310
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "param_name",
+          "name": "param_name",
+          "type": "STRING",
+          "widget": {
+            "name": "param_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "options",
+          "name": "options",
+          "type": "STRING",
+          "widget": {
+            "name": "options"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "required",
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "description",
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "example",
+          "name": "example",
+          "type": "STRING",
+          "widget": {
+            "name": "example"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "advanced",
+          "name": "advanced",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "advanced"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "group",
+          "name": "group",
+          "type": "STRING",
+          "widget": {
+            "name": "group"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "order",
+          "name": "order",
+          "type": "INT",
+          "widget": {
+            "name": "order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "*",
+          "links": [
+            56
+          ]
+        }
+      ],
+      "title": "12. transition (advanced)",
+      "properties": {
+        "Node name for S&R": "WorkflowIOEnumInput"
+      },
+      "widgets_values": [
+        "transition",
+        "start",
+        "start\npeak\nend",
+        false,
+        "Where a cut goes when a transition (wipe, dissolve, fast reveal) spreads over several frames. start: the first changing frame, so no frames of the next scene end up at the end of the previous one. end: right after the change. peak: the frame with the biggest change.",
+        "start",
+        true,
+        "Scene detection",
+        12
+      ],
+      "widgets_values_named": {
+        "param_name": "transition",
+        "value": "start",
+        "options": "start\npeak\nend",
+        "required": false,
+        "description": "Where a cut goes when a transition (wipe, dissolve, fast reveal) spreads over several frames. start: the first changing frame, so no frames of the next scene end up at the end of the previous one. end: right after the change. peak: the frame with the biggest change.",
+        "example": "start",
+        "advanced": true,
+        "group": "Scene detection",
+        "order": 12
+      }
+    },
+    {
+      "id": 39,
+      "type": "WorkflowIOTextInput",
+      "pos": [
+        480,
+        1238
+      ],
+      "size": [
+        400,
+        286
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "param_name",
+          "name": "param_name",
+          "type": "STRING",
+          "widget": {
+            "name": "param_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "required",
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "description",
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "example",
+          "name": "example",
+          "type": "STRING",
+          "widget": {
+            "name": "example"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "advanced",
+          "name": "advanced",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "advanced"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "group",
+          "name": "group",
+          "type": "STRING",
+          "widget": {
+            "name": "group"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "order",
+          "name": "order",
+          "type": "INT",
+          "widget": {
+            "name": "order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            57
+          ]
+        }
+      ],
+      "title": "13. cut_overrides (advanced)",
+      "properties": {
+        "Node name for S&R": "WorkflowIOTextInput"
+      },
+      "widgets_values": [
+        "cut_overrides",
+        "",
+        false,
+        "Manual fixes to the cuts, as frame numbers of the source video counted from 1: +120 adds a cut (frame 120 starts a scene), -340 removes the cut nearest frame 340. Comma separated. Leave empty normally; check the cut list for frame numbers.",
+        "-172, +170",
+        true,
+        "Scene detection",
+        13
+      ],
+      "widgets_values_named": {
+        "param_name": "cut_overrides",
+        "value": "",
+        "required": false,
+        "description": "Manual fixes to the cuts, as frame numbers of the source video counted from 1: +120 adds a cut (frame 120 starts a scene), -340 removes the cut nearest frame 340. Comma separated. Leave empty normally; check the cut list for frame numbers.",
+        "example": "-172, +170",
+        "advanced": true,
+        "group": "Scene detection",
+        "order": 13
       }
     }
   ],
@@ -3046,6 +3314,110 @@
       "STRING"
     ],
     [
+      41,
+      27,
+      0,
+      6,
+      0,
+      "VIDEO"
+    ],
+    [
+      42,
+      28,
+      0,
+      10,
+      3,
+      "BOOLEAN"
+    ],
+    [
+      44,
+      29,
+      0,
+      25,
+      3,
+      "STRING"
+    ],
+    [
+      45,
+      30,
+      0,
+      12,
+      2,
+      "STRING"
+    ],
+    [
+      46,
+      30,
+      0,
+      25,
+      4,
+      "STRING"
+    ],
+    [
+      49,
+      32,
+      0,
+      6,
+      1,
+      "COMBO"
+    ],
+    [
+      50,
+      33,
+      0,
+      6,
+      5,
+      "INT"
+    ],
+    [
+      52,
+      21,
+      0,
+      35,
+      0,
+      "VIDEO"
+    ],
+    [
+      53,
+      19,
+      0,
+      36,
+      0,
+      "VIDEO"
+    ],
+    [
+      54,
+      14,
+      5,
+      36,
+      1,
+      "STRING"
+    ],
+    [
+      55,
+      6,
+      6,
+      37,
+      0,
+      "IMAGE"
+    ],
+    [
+      43,
+      29,
+      0,
+      9,
+      1,
+      "STRING"
+    ],
+    [
+      47,
+      31,
+      0,
+      9,
+      2,
+      "IMAGE"
+    ],
+    [
       4,
       6,
       0,
@@ -3086,76 +3458,20 @@
       "STRING"
     ],
     [
+      51,
+      34,
+      0,
+      19,
+      2,
+      "COMBO"
+    ],
+    [
       28,
       18,
       3,
       19,
       4,
       "COMBO"
-    ],
-    [
-      25,
-      14,
-      0,
-      19,
-      10,
-      "VIDEO"
-    ],
-    [
-      41,
-      27,
-      0,
-      6,
-      0,
-      "VIDEO"
-    ],
-    [
-      42,
-      28,
-      0,
-      10,
-      3,
-      "BOOLEAN"
-    ],
-    [
-      43,
-      29,
-      0,
-      9,
-      1,
-      "STRING"
-    ],
-    [
-      44,
-      29,
-      0,
-      25,
-      3,
-      "STRING"
-    ],
-    [
-      45,
-      30,
-      0,
-      12,
-      2,
-      "STRING"
-    ],
-    [
-      46,
-      30,
-      0,
-      25,
-      4,
-      "STRING"
-    ],
-    [
-      47,
-      31,
-      0,
-      9,
-      2,
-      "IMAGE"
     ],
     [
       48,
@@ -3166,60 +3482,28 @@
       "IMAGE"
     ],
     [
-      49,
-      32,
-      0,
-      6,
-      1,
-      "COMBO"
-    ],
-    [
-      50,
-      33,
-      0,
-      6,
-      5,
-      "INT"
-    ],
-    [
-      51,
-      34,
-      0,
-      19,
-      2,
-      "COMBO"
-    ],
-    [
-      52,
-      21,
-      0,
-      35,
-      0,
-      "VIDEO"
-    ],
-    [
-      53,
-      19,
-      0,
-      36,
-      0,
-      "VIDEO"
-    ],
-    [
-      54,
+      25,
       14,
-      5,
-      36,
-      1,
-      "STRING"
+      0,
+      19,
+      10,
+      "VIDEO"
     ],
     [
-      55,
-      6,
-      6,
-      37,
+      56,
+      38,
       0,
-      "IMAGE"
+      6,
+      9,
+      "COMBO"
+    ],
+    [
+      57,
+      39,
+      0,
+      6,
+      8,
+      "STRING"
     ]
   ],
   "groups": [
@@ -3314,7 +3598,7 @@
         460,
         -20,
         440,
-        1258
+        1994
       ],
       "color": "#4a4a2a",
       "flags": {}

@@ -32,6 +32,8 @@ DETECTORS = ["all", "content", "adaptive", "fade"]
 ADAPTIVE_WINDOW = 2        # frames on each side the adaptive detector averages over
 ADAPTIVE_MIN_CONTENT = 15  # adaptive cuts also need this much raw content change
 MERGE_WINDOW = 3           # cuts from different detectors this close are one cut
+TRANSITIONS = ["peak", "start", "end"]
+TRANSITION_FRACTION = 0.4  # a frame is part of a gradual transition while its change is >= this x content_threshold
 
 
 # ---------------------------------------------------------------------------
@@ -212,6 +214,38 @@ def detect_cuts(hsv, detector, content_threshold, adaptive_threshold, fade_thres
     return _merge(candidates, len(hsv), max(1, min_scene_length)), scores
 
 
+def _place_in_transition(cuts, scores, mode, content_threshold, min_scene_length):
+    """Move hard cuts that sit inside a gradual transition (wipe, dissolve, fast reveal) to its first or
+    last frame. A transition is the run of frames around the cut whose change stays at or above
+    TRANSITION_FRACTION x content_threshold. start: the new scene begins where the change begins, so
+    the transition goes with the next scene. end: it begins right after the change, so it stays with
+    the previous scene. Fade cuts keep their place in the middle of the black."""
+    if mode == "peak" or not cuts:
+        return cuts
+    floor = TRANSITION_FRACTION * content_threshold
+    span = max(1, min_scene_length)
+    n = len(scores) + 1
+    frames = [c["frame"] for c in cuts]
+    for j, c in enumerate(cuts):
+        if c["detectors"] == ["fade"]:
+            continue
+        k = c["frame"]
+        lo = (frames[j - 1] + 1) if j > 0 else 1
+        hi = (frames[j + 1] - 1) if j + 1 < len(cuts) else n - 1
+        if mode == "start":
+            # scores[k - 1] is the change into frame k
+            while k - 1 >= lo and c["frame"] - (k - 1) <= span and scores[k - 2] >= floor:
+                k -= 1
+        else:
+            while k + 1 <= hi and (k + 1) - c["frame"] <= span and scores[k] >= floor:
+                k += 1
+        if k != c["frame"]:
+            c["moved_from"] = c["frame"]
+            c["frame"] = k
+            frames[j] = k
+    return cuts
+
+
 def _is_flash(hsv, k, threshold, min_scene_length):
     """A jump at k is a flash (not a cut) when the picture before it returns within min_scene_length frames,
     or when it jumps back to the picture before a jump less than min_scene_length frames earlier."""
@@ -371,6 +405,14 @@ class SplitVideoByScene:
                                              "tooltip": "Manual fixes, frames counted from 1 in the source file: "
                                                         "+120 adds a cut (frame 120 starts a scene), -340 removes the cut "
                                                         "detected nearest 340 (within 3 frames). Comma separated."}),
+                "transition": (TRANSITIONS, {"default": "peak",
+                                             "tooltip": "Where a cut goes when the change is spread over several "
+                                                        "frames (a wipe, a dissolve, a fast reveal). peak: the frame "
+                                                        "with the biggest change. start: the first changing frame, so "
+                                                        "the transition goes with the next scene (no next-scene frames "
+                                                        "at the end of the previous one). end: right after the change, "
+                                                        "so it stays with the previous scene. Fades through black "
+                                                        "always cut in the middle of the black."}),
             },
         }
 
@@ -392,7 +434,7 @@ class SplitVideoByScene:
                    "into the source: nothing is re-encoded. Frame numbers start at 1.")
 
     def split(self, video, detector, content_threshold, adaptive_threshold, fade_threshold,
-              min_scene_length, trim_edges, analysis_size, cut_overrides):
+              min_scene_length, trim_edges, analysis_size, cut_overrides, transition="peak"):
         source = _file_source(video)
         if source is not None:
             path, info, first, last, crop = source
@@ -410,6 +452,7 @@ class SplitVideoByScene:
         n = last - first + 1
         cuts, scores = detect_cuts(hsv, detector, content_threshold, adaptive_threshold, fade_threshold,
                                    min_scene_length)
+        cuts = _place_in_transition(cuts, scores, transition, content_threshold, min_scene_length)
 
         # Overrides are file frames (1-based); cuts are positions inside the analysed range.
         add, remove = _parse_overrides(cut_overrides)
@@ -465,8 +508,10 @@ class SplitVideoByScene:
                         "start_tc": _timecode(s - 1, fps), "end_tc": _timecode(e - 1, fps),
                         "seconds": round((e - s + 1) / float(fps), 3)}
                        for i, (s, e) in enumerate(zip(starts, ends))],
+            "transition": transition,
             "cuts": [{"frame": first + c["frame"] + 1, "tc": _timecode(first + c["frame"], fps),
-                      "strength": c["strength"], "detectors": c["detectors"]} for c in cuts],
+                      "strength": c["strength"], "detectors": c["detectors"],
+                      **({"moved_from": first + c["moved_from"] + 1} if "moved_from" in c else {})} for c in cuts],
         }
         sheet = _contact_sheet([f[0] for f in first_frames])
         return (scenes, first_frames, starts, ends, len(scenes), json.dumps(cut_list, indent=2), sheet)

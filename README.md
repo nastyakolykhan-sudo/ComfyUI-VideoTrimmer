@@ -85,7 +85,7 @@ doubles as an API: each input has a `param_name`, description, example, group an
 | `filter_prompt` | text | What to look for: a product or brand, people, nature, furniture, anything visible |
 | `edit_prompt` | text | What to change, once for the whole video. Can name scenes ("in scene 3...") or describe them |
 | `reference_image` | image | What the edit refers to (e.g. the new product). Required: the IO image input can't be left empty |
-| `detector`, `min_scene_length`, `resolution` | advanced | Scene detection and Wan's output resolution |
+| `detector`, `min_scene_length`, `transition` (`start`), `cut_overrides`, `resolution` | advanced | Scene detection, manual cut fixes and Wan's output resolution |
 
 Outputs: `final_film` (mp4), the edited scenes (`scene_N`, one file per scene, named by
 Scene Gate's `labels`) and the `contact_sheet`.
@@ -127,6 +127,7 @@ takes a VIDEO and returns one, can stand in for Gemini and Wan.
 | `trim_edges` | 0 | Frames dropped on each side of every cut (dissolve leftovers) |
 | `analysis_size` | 256 | Long side in px that detection looks at; outputs stay full size |
 | `cut_overrides` | | `+120, -340`: add a cut at frame 120, remove the one nearest 340 (source frames, from 1) |
+| `transition` | `peak` | Where a cut goes when the change is spread over several frames (a wipe, a dissolve, a fast reveal): `peak` the frame with the biggest change, `start` the first changing frame (the transition goes with the next scene, so no next-scene frames end the previous one), `end` right after the change. A frame belongs to the transition while its change is at least 0.4 × `content_threshold`. Fades through black always cut in the middle of the black |
 
 | Output | |
 |---|---|
